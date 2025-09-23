@@ -1,0 +1,52 @@
+body {
+    background-color: #fffaf5;
+    color: #333;
+    font-family: 'Segoe UI', sans-serif;
+}
+.commission-box {
+    background-color: white;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    border: 2px solid #f36f21;
+}
+.xtra-commission { background-color: #f36f21; color: white; }
+.total-commission { background-color: #ff8c00; color: white; }
+.shopee-commission { background-color: #ff5722; color: white; }
+#captureBtn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f36f21;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+#captureBtn:hover {
+    background-color: #e55a0e;
+}
+.toast-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    z-index: 1000;
+    animation: fadeInOut 2s ease-in-out forwards;
+}
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(20px); }
+    20% { opacity: 1; transform: translateY(0); }
+    80% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-20px); }
+}

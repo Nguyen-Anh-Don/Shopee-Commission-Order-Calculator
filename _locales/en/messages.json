@@ -1,0 +1,74 @@
+{
+    "extName":
+    {
+        "message": "Shopee Commission & Order Calculator"
+    },
+    "extDesc":
+    {
+        "message": "Calculate Shopee commissions and orders instantly after conversion – no need to wait!"
+    },
+    "title":
+    {
+        "message": "Shopee Commission Calculator"
+    },
+    "header":
+    {
+        "message": "Shopee Commission Calculator Tool"
+    },
+    "total":
+    {
+        "message": "Total Commission"
+    },
+    "date":
+    {
+        "message": "Date:"
+    },
+    "dateWarning":
+    {
+        "message": "You are viewing results from multiple days."
+    },
+    "type":
+    {
+        "message": "Order Type"
+    },
+    "count":
+    {
+        "message": "Order Count"
+    },
+    "all":
+    {
+        "message": "Total"
+    },
+    "video":
+    {
+        "message": "Video Orders"
+    },
+    "live":
+    {
+        "message": "Live Orders"
+    },
+    "social":
+    {
+        "message": "Social Orders"
+    },
+    "zero":
+    {
+        "message": "0đ Orders"
+    },
+    "unpaid":
+    {
+        "message": "Unpaid Orders"
+    },
+    "cancel":
+    {
+        "message": "Canceled Orders"
+    },
+    "pageWarning":
+    {
+        "message": "Multiple pages detected. Please scroll to the bottom and select page 1."
+    },
+    "scroll":
+    {
+        "message": "Scroll to Bottom"
+    }
+}

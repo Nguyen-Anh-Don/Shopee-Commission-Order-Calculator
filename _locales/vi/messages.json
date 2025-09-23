@@ -1,0 +1,74 @@
+{
+    "extName":
+    {
+        "message": "Shopee Commission & Order Calculator"
+    },
+    "extDesc":
+    {
+        "message": "Tính hoa hồng và số đơn hàng Shopee ngay khi có chuyển đổi – không cần chờ app cập nhật!"
+    },
+    "title":
+    {
+        "message": "Shopee Commission Calculator"
+    },
+    "header":
+    {
+        "message": "Công cụ tính hoa hồng Shopee"
+    },
+    "total":
+    {
+        "message": "Tổng hoa hồng"
+    },
+    "date":
+    {
+        "message": "Ngày:"
+    },
+    "dateWarning":
+    {
+        "message": "Bạn đang xem kết quả của nhiều ngày khác nhau."
+    },
+    "type":
+    {
+        "message": "Loại đơn hàng"
+    },
+    "count":
+    {
+        "message": "Số đơn"
+    },
+    "all":
+    {
+        "message": "Tổng"
+    },
+    "video":
+    {
+        "message": "Đơn video"
+    },
+    "live":
+    {
+        "message": "Đơn live"
+    },
+    "social":
+    {
+        "message": "Đơn social"
+    },
+    "zero":
+    {
+        "message": "Đơn 0đ"
+    },
+    "unpaid":
+    {
+        "message": "Đơn chưa thanh toán"
+    },
+    "cancel":
+    {
+        "message": "Đơn huỷ"
+    },
+    "pageWarning":
+    {
+        "message": "Có nhiều hơn 1 trang hiển thị, hãy kéo xuống dưới cùng và chọn trang 1."
+    },
+    "scroll":
+    {
+        "message": "Cuộn xuống cuối trang"
+    }
+}

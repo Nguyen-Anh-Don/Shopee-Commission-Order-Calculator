@@ -1,0 +1,74 @@
+{
+    "extName":
+    {
+        "message": "Shopee Commission & Order Calculator"
+    },
+    "extDesc":
+    {
+        "message": "คำนวณค่าคอมมิชชั่นและจำนวนคำสั่งซื้อ Shopee ได้ทันทีหลังการแปลง – ไม่ต้องรอ!"
+    },
+    "title":
+    {
+        "message": "Shopee Commission Calculator"
+    },
+    "header":
+    {
+        "message": "เครื่องคำนวณค่าคอมมิชชั่น Shopee"
+    },
+    "total":
+    {
+        "message": "ค่าคอมรวม"
+    },
+    "date":
+    {
+        "message": "วันที่:"
+    },
+    "dateWarning":
+    {
+        "message": "คุณกำลังดูผลลัพธ์จากหลายวัน"
+    },
+    "type":
+    {
+        "message": "ประเภทคำสั่งซื้อ"
+    },
+    "count":
+    {
+        "message": "จำนวนคำสั่งซื้อ"
+    },
+    "all":
+    {
+        "message": "รวมทั้งหมด"
+    },
+    "video":
+    {
+        "message": "คำสั่งซื้อจากวิดีโอ"
+    },
+    "live":
+    {
+        "message": "คำสั่งซื้อจากไลฟ์"
+    },
+    "social":
+    {
+        "message": "คำสั่งซื้อจากโซเชียล"
+    },
+    "zero":
+    {
+        "message": "คำสั่งซื้อ 0฿"
+    },
+    "unpaid":
+    {
+        "message": "ยังไม่ชำระเงิน"
+    },
+    "cancel":
+    {
+        "message": "ยกเลิกแล้ว"
+    },
+    "pageWarning":
+    {
+        "message": "มีมากกว่าหนึ่งหน้า กรุณาเลื่อนไปด้านล่างและเลือกหน้า 1"
+    },
+    "scroll":
+    {
+        "message": "เลื่อนลงล่างสุด"
+    }
+}

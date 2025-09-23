@@ -1,0 +1,74 @@
+{
+    "extName":
+    {
+        "message": "Shopee Commission & Order Calculator"
+    },
+    "extDesc":
+    {
+        "message": "Hitung komisi dan jumlah pesanan Shopee secara instan setelah konversi – tidak perlu menunggu!"
+    },
+    "title":
+    {
+        "message": "Shopee Commission Calculator"
+    },
+    "header":
+    {
+        "message": "Alat Hitung Komisi Shopee"
+    },
+    "total":
+    {
+        "message": "Total Komisi"
+    },
+    "date":
+    {
+        "message": "Tanggal:"
+    },
+    "dateWarning":
+    {
+        "message": "Anda sedang melihat hasil dari beberapa hari yang berbeda."
+    },
+    "type":
+    {
+        "message": "Jenis Pesanan"
+    },
+    "count":
+    {
+        "message": "Jumlah Pesanan"
+    },
+    "all":
+    {
+        "message": "Total"
+    },
+    "video":
+    {
+        "message": "Pesanan Video"
+    },
+    "live":
+    {
+        "message": "Pesanan Live"
+    },
+    "social":
+    {
+        "message": "Pesanan Sosial"
+    },
+    "zero":
+    {
+        "message": "Pesanan 0Rp"
+    },
+    "unpaid":
+    {
+        "message": "Belum Dibayar"
+    },
+    "cancel":
+    {
+        "message": "Dibatalkan"
+    },
+    "pageWarning":
+    {
+        "message": "Terdapat lebih dari 1 halaman. Silakan gulir ke bawah dan pilih halaman 1."
+    },
+    "scroll":
+    {
+        "message": "Gulir ke bawah"
+    }
+}

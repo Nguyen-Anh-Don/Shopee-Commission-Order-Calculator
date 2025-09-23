@@ -1,0 +1,74 @@
+{
+    "extName":
+    {
+        "message": "Shopee Commission & Order Calculator"
+    },
+    "extDesc":
+    {
+        "message": "Kalkulahin ang komisyon at mga order sa Shopee agad matapos ang conversion – hindi kailangang maghintay!"
+    },
+    "title":
+    {
+        "message": "Shopee Commission Calculator"
+    },
+    "header":
+    {
+        "message": "Shopee Commission Calculator Tool"
+    },
+    "total":
+    {
+        "message": "Kabuuang Komisyon"
+    },
+    "date":
+    {
+        "message": "Petsa:"
+    },
+    "dateWarning":
+    {
+        "message": "Tinitingnan mo ang mga resulta mula sa maraming araw."
+    },
+    "type":
+    {
+        "message": "Uri ng Order"
+    },
+    "count":
+    {
+        "message": "Bilang ng Order"
+    },
+    "all":
+    {
+        "message": "Kabuuan"
+    },
+    "video":
+    {
+        "message": "Video Orders"
+    },
+    "live":
+    {
+        "message": "Live Orders"
+    },
+    "social":
+    {
+        "message": "Social Orders"
+    },
+    "zero":
+    {
+        "message": "0₱ Orders"
+    },
+    "unpaid":
+    {
+        "message": "Hindi Pa Bayad"
+    },
+    "cancel":
+    {
+        "message": "Kanselado"
+    },
+    "pageWarning":
+    {
+        "message": "May higit sa isang pahina. Mangyaring pumunta sa ibaba at piliin ang page 1."
+    },
+    "scroll":
+    {
+        "message": "Mag-scroll pababa"
+    }
+}
