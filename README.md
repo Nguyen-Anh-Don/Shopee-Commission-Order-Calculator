@@ -2,6 +2,11 @@
 
 Tiện ích mở rộng Chrome giúp tính hoa hồng và số đơn hàng Shopee ngay khi có chuyển đổi – không cần chờ app cập nhật!
 
+## 🖼️ Ảnh demo
+
+![Demo Screenshot](https://upanh.nhatkythuthuat.com/images/2025/11/14/cover.png)
+
+
 [![Version](https://img.shields.io/badge/version-1.6.4-orange.svg)](https://github.com)
 [![Chrome Web Store](https://img.shields.io/badge/Chrome-Extension-green.svg)](https://chrome.google.com/webstore)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
