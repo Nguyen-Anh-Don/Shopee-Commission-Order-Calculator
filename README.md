@@ -89,6 +89,7 @@ Hỗ trợ 5 ngôn ngữ:
 ### Cách 1: Cài đặt từ Chrome Web Store (Khuyến nghị)
 
 1. Truy cập [Chrome Web Store](https://chrome.google.com/webstore) và tìm kiếm "Shopee Commission Calculator"
+   hoặc truy cập trực tiếp: [Shopee Commission Order Calculator](https://chromewebstore.google.com/detail/shopee-commission-order-c/eodhlockngfflpnhmohlfeaniklalabb)
 2. Nhấn nút **"Thêm vào Chrome"**
 3. Xác nhận cài đặt
 
