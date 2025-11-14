@@ -1,9 +1,7 @@
 {
-"update_url": "https://clients2.google.com/service/update2/crx",
-
     "manifest_version": 3,
     "name": "__MSG_extName__",
-    "version": "1.6.2",
+    "version": "1.6.4",
     "description": "__MSG_extDesc__",
     "default_locale": "vi",
     "action":

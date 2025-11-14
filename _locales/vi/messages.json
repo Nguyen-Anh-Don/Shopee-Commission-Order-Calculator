@@ -67,6 +67,10 @@
     {
         "message": "Có nhiều hơn 1 trang hiển thị, hãy kéo xuống dưới cùng và chọn trang 1."
     },
+    "commissionWarning":
+    {
+        "message": "Hoa hồng hiển thị chưa trừ đi phí quản lý MCN."
+    },
     "scroll":
     {
         "message": "Cuộn xuống cuối trang"

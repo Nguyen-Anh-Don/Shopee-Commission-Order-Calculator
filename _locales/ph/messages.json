@@ -67,6 +67,10 @@
     {
         "message": "May higit sa isang pahina. Mangyaring pumunta sa ibaba at piliin ang page 1."
     },
+    "commissionWarning":
+    {
+        "message": "Ang ipinapakitang komisyon ay hindi pa nababawasang MCN management fee."
+    },
     "scroll":
     {
         "message": "Mag-scroll pababa"

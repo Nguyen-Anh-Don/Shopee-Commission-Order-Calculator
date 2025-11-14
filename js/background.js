@@ -9,6 +9,7 @@ let isPolling = false; // 1) khóa tránh gọi chồng
 chrome.runtime.onInstalled.addListener(() => {
     chrome.alarms.create(ALARM_NAME, { periodInMinutes: 5 });
 });
+
 chrome.runtime.onStartup.addListener(() => {
     chrome.alarms.create(ALARM_NAME, { periodInMinutes: 5 });
 });
@@ -21,8 +22,8 @@ function fmtYMD(d) {
 function getYesterdayRangeSeconds() {
     const now = new Date();
     const today00 = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // hôm nay 00:00
-    const startYesterday = new Date(today00.getTime() - 86400000);              // hôm qua 00:00
-    const endYesterday = new Date(today00.getTime() - 1000);                    // hôm qua 23:59:59
+    const startYesterday = new Date(today00.getTime() - 86400000); // hôm qua 00:00
+    const endYesterday = new Date(today00.getTime() - 1000); // hôm qua 23:59:59
     return {
         s: Math.floor(startYesterday.getTime() / 1000),
         e: Math.floor(endYesterday.getTime() / 1000),
@@ -30,11 +31,11 @@ function getYesterdayRangeSeconds() {
 }
 
 async function ensureDailyReset() {
-  const today = fmtYMD(new Date());
-  const { [NOTIFY_KEY]: notifiedDay } = await chrome.storage.local.get(NOTIFY_KEY);
-  if (notifiedDay && notifiedDay !== today) {
-    await chrome.storage.local.remove(NOTIFY_KEY);
-  }
+    const today = fmtYMD(new Date());
+    const { [NOTIFY_KEY]: notifiedDay } = await chrome.storage.local.get(NOTIFY_KEY);
+    if (notifiedDay && notifiedDay !== today) {
+        await chrome.storage.local.remove(NOTIFY_KEY);
+    }
 }
 
 // === Notifications
@@ -45,7 +46,7 @@ async function showLoginNotif() {
         type: "basic",
         iconUrl: "/icon/icon128.png",
         title: "Công cụ tính hoa hồng Shopee",
-        message: "Phiên đăng nhập Shopee Affiliate đã hết hạn.\nNhấp để mở Shopee Affiliate và đăng nhập lại."
+        message: "Phiên đăng nhập Shopee Affiliate đã hết hạn.\nNhấp để mở Shopee Affiliate và đăng nhập lại.",
     });
 }
 
@@ -57,11 +58,11 @@ async function showYesterdayDataNotif(total) {
         type: "basic",
         iconUrl: "/icon/icon128.png",
         title: "Công cụ tính hoa hồng Shopee",
-        message: `Đang bắt đầu lên đơn hôm qua, đã hiện: ${totalText} đơn.`
-  });
+        message: `Đang bắt đầu lên đơn hôm qua, đã hiện: ${totalText} đơn.`,
+    });
 }
 
-// === 1 listener click cho tất cả notification
+// === listener click cho tất cả notification
 chrome.notifications.onClicked.addListener((notifId) => {
     if (notifId === LOGIN_NOTIF_ID) {
         chrome.tabs.create({ url: "https://affiliate.shopee.vn/" });
@@ -76,44 +77,45 @@ chrome.notifications.onClicked.addListener((notifId) => {
 async function pollShopee() {
     if (isPolling) return; // 1) khoá
     isPolling = true;
-    try { // 0) nếu hôm nay đã báo, bỏ qua sớm
-    const today = fmtYMD(new Date());
-    const { [NOTIFY_KEY]: notifiedDay } = await chrome.storage.local.get(NOTIFY_KEY);
-    if (notifiedDay === today) {
-        console.debug("pollShopee: đã thông báo hôm nay");
-        return;
-    }
-
-    // 1) gọi API
-    const { s, e } = getYesterdayRangeSeconds();
-    const url = `https://affiliate.shopee.vn/api/v3/report/list?page_size=500&page_num=1&purchase_time_s=${s}&purchase_time_e=${e}&version=1`;
-
-    const res = await fetch(url, { credentials: "include" });
-
-    if (res.status === 401) {
-        await showLoginNotif();
-        return;
-    }
-    if (!res.ok) {
-        console.warn("pollShopee: HTTP", res.status);
-        return;
-    }
-
-    let json = null;
     try {
-        json = await res.json();
-    } catch (e) {
-        console.warn("pollShopee: bad JSON", e);
-        return;
-    }
-
-    if (json && json.code === 0) {
-        const total = json.data?.total_count || 0;
-        if (total > 0) {
-            await showYesterdayDataNotif(total);
-            await chrome.storage.local.set({ [NOTIFY_KEY]: today }); // báo 1 lần/ngày
+        // 0) nếu hôm nay đã báo, bỏ qua sớm
+        const today = fmtYMD(new Date());
+        const { [NOTIFY_KEY]: notifiedDay } = await chrome.storage.local.get(NOTIFY_KEY);
+        if (notifiedDay === today) {
+            console.debug("pollShopee: đã thông báo hôm nay");
+            return;
         }
-    }
+
+        // 1) gọi API
+        const { s, e } = getYesterdayRangeSeconds();
+        const url = `https://affiliate.shopee.vn/api/v3/report/list?page_size=500&page_num=1&purchase_time_s=${s}&purchase_time_e=${e}&version=1`;
+
+        const res = await fetch(url, { credentials: "include" });
+
+        if (res.status === 401) {
+            await showLoginNotif();
+            return;
+        }
+        if (!res.ok) {
+            console.warn("pollShopee: HTTP", res.status);
+            return;
+        }
+
+        let json = null;
+        try {
+            json = await res.json();
+        } catch (e) {
+            console.warn("pollShopee: bad JSON", e);
+            return;
+        }
+
+        if (json && json.code === 0) {
+            const total = json.data?.total_count || 0;
+            if (total > 0) {
+                await showYesterdayDataNotif(total);
+                await chrome.storage.local.set({ [NOTIFY_KEY]: today }); // báo 1 lần/ngày
+            }
+        }
     } catch (err) {
         console.error("pollShopee error:", err);
     } finally {
@@ -143,24 +145,24 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
         // 4) Gọi poll (không await) — có khoá isPolling trong pollShopee()
         //    thêm .catch để không leak lỗi Promise
-        Promise.resolve().then(() => pollShopee()).catch((e) => {
-            console.warn("[alarm] pollShopee error:", e);
-        });
+        Promise.resolve()
+            .then(() => pollShopee())
+            .catch((e) => {
+                console.warn("[alarm] pollShopee error:", e);
+            });
     } catch (err) {
         console.error("[alarm] handler error:", err);
     }
 });
 
-/*
 // Mở trang welcome.html khi tiện ích được cài đặt
 chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === "install") {
         chrome.tabs.create({
-            url: "https://chatvn.org/extension/thank-you.html"
+            url: "https://addlivetag.com/extension/thank-you.html",
         });
     }
 });
 
 // Mở trang feedback.html khi tiện ích bị gỡ cài đặt
-chrome.runtime.setUninstallURL("https://chatvn.org/extension/uninstall.html");
-*/
+chrome.runtime.setUninstallURL("https://addlivetag.com/extension/uninstall.html");

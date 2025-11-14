@@ -67,6 +67,10 @@
     {
         "message": "Multiple pages detected. Please scroll to the bottom and select page 1."
     },
+    "commissionWarning":
+    {
+        "message": "The displayed commission has not deducted the MCN management fee."
+    },
     "scroll":
     {
         "message": "Scroll to Bottom"

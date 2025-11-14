@@ -67,6 +67,10 @@
     {
         "message": "Terdapat lebih dari 1 halaman. Silakan gulir ke bawah dan pilih halaman 1."
     },
+    "commissionWarning":
+    {
+        "message": "Komisi yang ditampilkan belum dikurangi biaya manajemen MCN."
+    },
     "scroll":
     {
         "message": "Gulir ke bawah"
