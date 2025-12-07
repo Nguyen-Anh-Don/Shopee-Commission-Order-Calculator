@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Xem lịch sử đơn hàng đã đồng bộ - Shopee Commission Calculator</title>
+        <link href="/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+        <style>
+            
+            body {
+                background-color: #fffaf5;
+                color: #333;
+                font-family: "Segoe UI", sans-serif;
+            }
+
+            a {
+                text-decoration: none;
+            }
+
+            .commission-box {
+                background-color: white;
+                border-radius: 8px;
+                padding: 8px;
+                text-align: center;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+                border: 2px solid #f36f21;
+                margin-bottom: 15px;
+            }
+
+            .xtra-commission {
+                background-color: #f36f21;
+                color: white;
+            }
+
+            .total-commission {
+                background-color: #ff8c00;
+                color: white;
+            }
+
+            .shopee-commission {
+                background-color: #ff5722;
+                color: white;
+            }
+
+            .gmv-stats {
+                background-color: #e3f2fd;
+                color: #0d47a1;
+            }
+
+            .gmv-commission {
+                background-color: #ffe1b2;
+                color: #333;
+            }
+
+            .com-stats {
+                background-color: #e8f5e9;
+                color: #1b5e20;
+            }
+
+            .performance-stats {
+                background-color: #fff3e0;
+                color: #e65100;
+            }
+
+            #captureBtn {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 1000;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: #f36f21;
+                border: none;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            }
+
+            #captureBtn:hover {
+                background-color: #e55a0e;
+            }
+
+            .toast-notification {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background-color: #28a745;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 6px;
+                z-index: 1000;
+                animation: fadeInOut 2s ease-in-out forwards;
+            }
+
+            @keyframes fadeInOut {
+                0% {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                20% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+                80% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+            }
+
+            .filter-section {
+                background-color: white;
+                border-radius: 8px;
+                padding: 8px;
+                margin-bottom: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .stats-card {
+                background-color: white;
+                border-radius: 8px;
+                padding: 8px;
+                margin-bottom: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .table-responsive {
+                max-height: 500px;
+                overflow-y: auto;
+            }
+
+            .nav-tabs .nav-link.active {
+                background-color: #f36f21;
+                color: white;
+                border-color: #f36f21;
+            }
+
+            .chart-container {
+                position: relative;
+                height: 300px;
+                width: 100%;
+            }
+
+            .tab-content {
+                padding: 15px;
+                border: 1px solid #dee2e6;
+                border-top: none;
+                border-radius: 0 0 5px 5px;
+            }
+
+            .export-btn {
+                background-color: #4caf50;
+                color: white;
+                padding: 8px 16px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                margin-right: 10px;
+            }
+
+            .export-btn:hover {
+                background-color: #45a049;
+            }
+
+            .alert-box {
+                padding: 10px;
+                margin-bottom: 15px;
+                border-radius: 4px;
+            }
+
+            .alert-warning {
+                background-color: #fff3cd;
+                border: 1px solid #ffeeba;
+                color: #856404;
+            }
+
+            .alert-danger {
+                background-color: #f8d7da;
+                border: 1px solid #f5c6cb;
+                color: #721c24;
+            }
+
+            .loading {
+                text-align: center;
+                padding: 20px;
+            }
+
+            .quick-date-btn.active {
+                background-color: #0d6efd;
+                color: white;
+                border-color: #0d6efd;
+            }
+
+            .quick-date-btn.active:hover {
+                background-color: #0b5ed7;
+                border-color: #0a58ca;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container mt-4">
+            <h2 class="text-center mb-3">Xem lịch sử đơn hàng</h2>
+            <div class="text-right mb-2 small text-muted" style="font-size: 13px"><i class="fa-solid fa-calendar-days"></i> Phiên bản: v2.0.0</div>
+
+            <div id="loadingMessage" class="loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <p class="mt-2">Đang tải dữ liệu...</p>
+            </div>
+
+            <div id="noDataMessage" class="alert alert-warning" style="display: none">
+                <strong>Chưa có dữ liệu!</strong>
+                <p class="mb-1">Vui lòng đồng bộ dữ liệu từ trang cài đặt trước.</p>
+                <p class="mb-0 small">Mở <strong>Cài đặt</strong> → <strong>Đồng bộ dữ liệu</strong> → Nhấn <strong>Đồng bộ ngay</strong></p>
+                <p class="mt-2 mb-0">
+                    <button class="btn btn-sm btn-primary" id="openOptionsBtn">Mở trang cài đặt</button>
+                </p>
+            </div>
+
+            <div id="noFilterResultsMessage" class="alert alert-info p-2" style="display: none">
+                <strong>Không có kết quả!</strong>
+                <p class="mb-0">Không tìm thấy đơn hàng nào phù hợp với bộ lọc bạn đã chọn. Vui lòng thử lại với tiêu chí khác.</p>
+            </div>
+
+            <div id="mainContent" style="display: none">
+                <!-- Phần bộ lọc -->
+                <div class="filter-section">
+                    <div class="bg-warning p-2 rounded mb-2">
+                        <h6 class="mb-0 small">VIP: Lọc theo sub_id</h6>
+                    </div>
+                    <form id="filterForm">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="start_date">Thời gian bắt đầu:</label>
+                                    <input type="date" class="form-control form-control-sm" id="start_date" name="start_date" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="start_time">Giờ bắt đầu:</label>
+                                    <input type="time" class="form-control form-control-sm" id="start_time" name="start_time" value="00:00" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="end_date">Thời gian kết thúc:</label>
+                                    <input type="date" class="form-control form-control-sm" id="end_date" name="end_date" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="end_time">Giờ kết thúc:</label>
+                                    <input type="time" class="form-control form-control-sm" id="end_time" name="end_time" value="23:59" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12 mb-2">
+                                <div class="form-group">
+                                    <label class="small">Chọn nhanh:</label>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-outline-primary quick-date-btn" data-days="1">Hôm qua</button>
+                                        <button type="button" class="btn btn-outline-primary quick-date-btn" data-days="7">7 ngày qua</button>
+                                        <button type="button" class="btn btn-outline-primary quick-date-btn" data-days="30">30 ngày qua</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <div class="form-group small">
+                                    <label for="sub_id" class="text-danger">Sub ID (nhập hoặc chọn từ <b>tất cả các sub_id</b>):</label>
+                                    <input list="all_sub_id_list" type="text" class="form-control form-control-sm" id="sub_id" name="sub_id" placeholder="Nhập hoặc chọn Sub ID bất kỳ" />
+                                    <datalist id="all_sub_id_list"></datalist>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group small">
+                                    <label for="sub_id_type">Lọc sub_id theo từng trường: </label>
+                                    <select class="form-control mb-2" id="sub_id_type" name="sub_id_type">
+                                        <option value="">--Chọn loại sub_id--</option>
+                                        <option value="sub_id1">sub_id1</option>
+                                        <option value="sub_id2">sub_id2</option>
+                                        <option value="sub_id3">sub_id3</option>
+                                        <option value="sub_id4">sub_id4</option>
+                                        <option value="sub_id5">sub_id5</option>
+                                    </select>
+                                    <input list="subid_field_list" type="text" class="form-control form-control-sm" id="sub_id_field" name="sub_id_field" placeholder="Nhập hoặc chọn Sub ID theo từng loại" />
+                                    <datalist id="subid_field_list"></datalist>
+                                    <small class="form-text text-muted">Bạn chỉ cần điền sub_id vào 1 ô: ô trên tìm từ tất cả sub_id, ô dưới chọn loại sub_id cụ thể.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-warning btn-sm btn-block px-3 py-1">👉Lọc dữ liệu</button>
+                    </form>
+                </div>
+
+                <!-- Kết quả -->
+                <div class="result mt-4" style="min-width: 600px; position: relative" id="result-capture">
+                    <button id="captureBtn" title="Chụp ảnh" style="position: absolute; top: 10px; right: 10px; z-index: 1000;">🌇</button>
+
+                    <h1 class="text-center mb-4">Công cụ tính hoa hồng Shopee</h1>
+
+                    <!-- Tab hiển thị thống kê -->
+                    <ul class="nav nav-tabs" id="statsTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="overview-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Tổng quan</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="gmv-tab" data-bs-toggle="tab" href="#gmv" role="tab" aria-controls="gmv" aria-selected="false">Thống kê GMV</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="commission-tab" data-bs-toggle="tab" href="#commission" role="tab" aria-controls="commission" aria-selected="false">Thống kê hoa hồng</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="performance-tab" data-bs-toggle="tab" href="#performance" role="tab" aria-controls="performance" aria-selected="false">Hiệu suất</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="statsTabContent">
+                        <!-- Tab Tổng quan -->
+                        <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                            <div class="row mb-2">
+                                <div class="col-4">
+                                    <div class="commission-box total-commission">
+                                        <span>Tổng hoa hồng</span>
+                                        <p class="fs-4 mb-0" id="totalCommission">0&nbsp;₫</p>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="commission-box xtra-commission">
+                                        <span>Xtra</span>
+                                        <p class="fs-4 mb-0" id="xtraCommission">0&nbsp;₫</p>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="commission-box shopee-commission">
+                                        <span>Shopee</span>
+                                        <p class="fs-4 mb-0" id="shopeeCommission">0&nbsp;₫</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-12">
+                                    <div class="commission-box gmv-commission">
+                                        <span>Tổng GMV</span>
+                                        <p class="fs-5 mb-0" id="totalGmv">0&nbsp;₫</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="text-center">Ngày: <span id="startDate"></span> <span id="endDate"></span></p>
+
+                            <!-- Thống kê đơn -->
+                            <table class="table table-bordered table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Loại đơn hàng</th>
+                                        <th>Số đơn</th>
+                                        <th>Hoa hồng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Tổng</td>
+                                        <td id="totalOrders">0 (<span id="orderTotal">0</span> - <span class="badge bg-secondary" id="orderZeroBadge">0</span> - <span class="badge bg-danger" id="orderCancelledBadge">0</span>)</td>
+                                        <td id="totalCommissionCell">0&nbsp;₫</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Đơn video</td>
+                                        <td id="videoOrders">0</td>
+                                        <td id="videoCommissionCell">0&nbsp;₫</td>
+                                    </tr>
+                                    <tr class="d-none" id="liveOrderRow">
+                                        <td>Đơn live</td>
+                                        <td id="liveOrders">0</td>
+                                        <td id="liveCommissionCell">0&nbsp;₫</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Đơn social</td>
+                                        <td id="socialOrders">0</td>
+                                        <td id="socialCommissionCell">0&nbsp;₫</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Đơn 0đ</td>
+                                        <td id="zeroCommissionOrders"><span class="badge bg-warning text-dark">0</span></td>
+                                        <td id="zeroCommissionCell">0&nbsp;₫</td>
+                                    </tr>
+                                    <tr class="d-none" id="unpaidOrderRow">
+                                        <td>Đơn chưa thanh toán</td>
+                                        <td id="unpaidOrders">0</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr class="d-none" id="canceledOrderRow">
+                                        <td>Đơn hủy</td>
+                                        <td id="canceledOrders">0</td>
+                                        <td id="canceledCommissionCell">0&nbsp;₫</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Tab Thống kê GMV -->
+                        <div class="tab-pane fade" id="gmv" role="tabpanel" aria-labelledby="gmv-tab">
+                            <div class="stats-card p-3" style="background: #e3f2fd; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07)">
+                                <h6 class="mb-3" style="font-weight: 700; color: #0d47a1"><i class="bi bi-currency-dollar"></i> Thống kê GMV</h6>
+                                <div class="row text-center">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="p-3 border rounded shadow-sm gmv-stats">
+                                            <div class="h6 font-weight-bold">Tổng GMV</div>
+                                            <div class="h4" id="gmvTotal">0 ₫</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="p-3 border rounded shadow-sm gmv-stats">
+                                            <div class="h6 font-weight-bold">Giá trị đơn hàng trung bình</div>
+                                            <div class="h4" id="gmvAverage">0 ₫</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="p-3 border rounded shadow-sm gmv-stats">
+                                            <div class="h6 font-weight-bold">GMV theo kênh</div>
+                                            <div class="mt-2">
+                                                <div>Video: <span id="gmvVideo">0</span> ₫</div>
+                                                <div>Live: <span id="gmvLive">0</span> ₫</div>
+                                                <div>Social: <span id="gmvSocial">0</span> ₫</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Biểu đồ GMV theo ngày -->
+                                <div class="mt-4">
+                                    <h6>GMV theo ngày</h6>
+                                    <div class="chart-container">
+                                        <canvas id="gmvByDayChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Biểu đồ GMV theo giờ -->
+                                <div class="mt-4">
+                                    <h6>GMV theo giờ trong ngày</h6>
+                                    <div class="chart-container">
+                                        <canvas id="gmvByHourChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Biểu đồ GMV theo danh mục -->
+                                <div class="mt-4">
+                                    <h6>GMV theo danh mục sản phẩm</h6>
+                                    <div class="chart-container">
+                                        <canvas id="gmvByCategoryChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Thống kê hoa hồng -->
+                        <div class="tab-pane fade" id="commission" role="tabpanel" aria-labelledby="commission-tab">
+                            <div class="stats-card p-3" style="background: #e8f5e9; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07)">
+                                <h6 class="mb-3" style="font-weight: 700; color: #1b5e20"><i class="bi bi-cash-stack"></i> Thống kê hoa hồng</h6>
+                                <div class="row text-center">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="p-3 border rounded shadow-sm com-stats">
+                                            <div class="h6 font-weight-bold">Tổng hoa hồng</div>
+                                            <div class="h4" id="comTotal">0 ₫</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="p-3 border rounded shadow-sm com-stats">
+                                            <div class="h6 font-weight-bold">Hoa hồng trung bình/đơn</div>
+                                            <div class="h4" id="comAverage">0 ₫</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="p-3 border rounded shadow-sm com-stats">
+                                            <div class="h6 font-weight-bold">Hoa hồng theo kênh</div>
+                                            <div class="mt-2">
+                                                <div>Video: <span id="comVideo">0</span> ₫</div>
+                                                <div>Live: <span id="comLive">0</span> ₫</div>
+                                                <div>Social: <span id="comSocial">0</span> ₫</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row text-center mt-3">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="p-3 border rounded shadow-sm com-stats">
+                                            <div class="h6 font-weight-bold">Tỷ lệ Xtra</div>
+                                            <div class="h4" id="comXtraRate">0%</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="p-3 border rounded shadow-sm com-stats">
+                                            <div class="h6 font-weight-bold">Tỷ lệ Shopee</div>
+                                            <div class="h4" id="comShopeeRate">0%</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="p-3 border rounded shadow-sm com-stats">
+                                            <div class="h6 font-weight-bold">Tỷ lệ hoa hồng</div>
+                                            <div class="h4" id="comRate">0%</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Biểu đồ hoa hồng theo ngày -->
+                                <div class="mt-4">
+                                    <h6>Hoa hồng theo ngày</h6>
+                                    <div class="chart-container">
+                                        <canvas id="comByDayChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Biểu đồ hoa hồng theo giờ -->
+                                <div class="mt-4">
+                                    <h6>Hoa hồng theo giờ trong ngày</h6>
+                                    <div class="chart-container">
+                                        <canvas id="comByHourChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Biểu đồ hoa hồng theo danh mục -->
+                                <div class="mt-4">
+                                    <h6>Hoa hồng theo danh mục sản phẩm</h6>
+                                    <div class="chart-container">
+                                        <canvas id="comByCategoryChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Hiệu suất -->
+                        <div class="tab-pane fade" id="performance" role="tabpanel" aria-labelledby="performance-tab">
+                            <div class="stats-card p-3" style="background: #fff3e0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07)">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="p-3 border rounded shadow-sm performance-stats">
+                                            <div class="h6 font-weight-bold">Top sản phẩm hiệu suất cao</div>
+                                            <div class="mt-3" id="topProductsList">
+                                                <p>Chưa có dữ liệu</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="p-3 border rounded shadow-sm performance-stats">
+                                            <div class="h6 font-weight-bold">Sản phẩm hiệu suất thấp</div>
+                                            <div class="mt-3" id="lowProductsList">
+                                                <p>Chưa có dữ liệu</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Cảnh báo hiệu suất -->
+                                <div class="mt-4">
+                                    <h6>Cảnh báo hiệu suất</h6>
+                                    <div id="performanceWarnings"></div>
+                                </div>
+
+                                <!-- Công cụ xuất báo cáo -->
+                                <div class="mt-4">
+                                    <h6>Xuất báo cáo</h6>
+                                    <div class="d-flex">
+                                        <button class="export-btn" id="exportCSVBtn">Xuất CSV</button>
+                                        <button class="export-btn" id="exportJSONBtn">Xuất JSON</button>
+                                        <button class="export-btn" id="printReportBtn">In báo cáo</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4" style="min-width: 600px; position: relative">
+                    <!-- Biểu đồ -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <h6>Biểu đồ hoa hồng</h6>
+                                <div class="chart-container">
+                                    <canvas id="commissionChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <h6>Biểu đồ loại đơn hàng</h6>
+                                <div class="chart-container">
+                                    <canvas id="orderTypeChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <div class="stats-card">
+                                <h6>Biểu đồ theo kênh bán hàng</h6>
+                                <div class="chart-container" style="height: 350px">
+                                    <canvas id="channelChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bảng shop và sản phẩm -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="stats-card">
+                                <h6>🏆 Shop có nhiều đơn nhất</h6>
+                                <ul class="list-group" id="topShopsList"></ul>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="stats-card">
+                                <h6>🔥 Top 5 sản phẩm nổi bật</h6>
+                                <ul class="list-group" id="topProductsList2"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="stats-card">
+                                <h6>🏅 Top 10 SubID Đóng Góp Đơn Nhiều Nhất</h6>
+                                <ul class="list-group" id="topSubIdsList"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <!-- Bảng chi tiết đơn hàng với DataTables -->
+                    <style>
+                        .dt-card {
+                            background: #fff;
+                            border-radius: 8px;
+                            padding: 8px;
+                            margin-bottom: 8px;
+                            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                        }
+
+                        .dt-label {
+                            font-weight: 500;
+                            margin-bottom: 10px;
+                        }
+
+                        .table thead th {
+                            white-space: nowrap;
+                        }
+                    </style>
+
+                    <div class="stats-card dt-card">
+                        <h6 class="dt-label">Chi tiết đơn hàng</h6>
+                        <ul class="nav nav-tabs" id="orderTab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="all-tab" data-bs-toggle="tab" href="#tab-all" role="tab" aria-controls="tab-all" aria-selected="true"> Tất cả (<span id="allOrdersCount">0</span>) </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="pending-tab" data-bs-toggle="tab" href="#tab-pending" role="tab" aria-controls="tab-pending" aria-selected="false"> Đang chờ xử lý </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="cancelled-tab" data-bs-toggle="tab" href="#tab-cancelled" role="tab" aria-controls="tab-cancelled" aria-selected="false"> Đã hủy </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content mt-2 small" id="orderTabContent">
+                            <div class="tab-pane fade show active" id="tab-all" role="tabpanel" aria-labelledby="all-tab">
+                                <div class="table-responsive" style="max-height: 90vh">
+                                    <table id="orders-table-all" class="table table-bordered table-hover" style="width: 100%">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>ID đơn hàng</th>
+                                                <th>Tên Shop</th>
+                                                <th style="min-width: 250px">Tên Item</th>
+                                                <th>Giá trị đơn(₫)</th>
+                                                <th>Số lượng</th>
+                                                <th>Tổng hoa hồng(₫)</th>
+                                                <th>Trạng thái</th>
+                                                <th>Kênh</th>
+                                                <th>SubID1</th>
+                                                <th>SubID2</th>
+                                                <th>SubID3</th>
+                                                <th>SubID4</th>
+                                                <th>SubID5</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab-pending" role="tabpanel" aria-labelledby="pending-tab">
+                                <div class="table-responsive">
+                                    <table id="orders-table-pending" class="table table-bordered table-hover" style="width: 100%">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>ID đơn hàng</th>
+                                                <th>Tên Shop</th>
+                                                <th style="min-width: 250px">Tên Item</th>
+                                                <th>Giá(₫)</th>
+                                                <th>Số lượng</th>
+                                                <th>Tổng hoa hồng(₫)</th>
+                                                <th>Trạng thái</th>
+                                                <th>Kênh</th>
+                                                <th>SubID1</th>
+                                                <th>SubID2</th>
+                                                <th>SubID3</th>
+                                                <th>SubID4</th>
+                                                <th>SubID5</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab-cancelled" role="tabpanel" aria-labelledby="cancelled-tab">
+                                <div class="table-responsive">
+                                    <table id="orders-table-cancelled" class="table table-bordered table-hover" style="width: 100%">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>ID đơn hàng</th>
+                                                <th>Tên Shop</th>
+                                                <th style="min-width: 250px">Tên Item</th>
+                                                <th>Giá(₫)</th>
+                                                <th>Số lượng</th>
+                                                <th>Tổng hoa hồng(₫)</th>
+                                                <th>Trạng thái</th>
+                                                <th>Kênh</th>
+                                                <th>SubID1</th>
+                                                <th>SubID2</th>
+                                                <th>SubID3</th>
+                                                <th>SubID4</th>
+                                                <th>SubID5</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/jquery.dataTables.min.js"></script>
+        <script src="/js/dataTables.bootstrap5.min.js"></script>
+        <script src="/js/chart.js"></script>
+        <script src="/js/chartjs-plugin-datalabels.min.js"></script>
+        <script src="/js/html2canvas.min.js"></script>
+        <script src="/js/processOrderData.js"></script>
+        <script src="/js/order-history.js"></script>
+    </body>
+</html>

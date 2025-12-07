@@ -25,11 +25,7 @@ function renderState({ enableNotif, notified_date, lastPoll }) {
 
     // lần poll gần nhất
     $("#lastPollAt").text(fmtTime(lastPoll?.time));
-    $("#lastTotal").text(
-        typeof lastPoll?.total === "number"
-            ? lastPoll.total.toLocaleString("vi-VN")
-            : "—",
-    );
+    $("#lastTotal").text(typeof lastPoll?.total === "number" ? lastPoll.total.toLocaleString("vi-VN") : "—");
 }
 
 async function loadState() {
@@ -46,9 +42,7 @@ $(function () {
     // toggle notif
     $("#enableNotif").on("change", function () {
         const value = this.checked;
-        chrome.runtime.sendMessage({ type: "setEnableNotif", value }, () =>
-            loadState(),
-        );
+        chrome.runtime.sendMessage({ type: "setEnableNotif", value }, () => loadState());
     });
 
     // manual poll
@@ -58,9 +52,7 @@ $(function () {
             // đợi 1 chút để background ghi lastPoll
             setTimeout(() => {
                 loadState();
-                $("#btnPollNow")
-                    .prop("disabled", false)
-                    .text("🔄 Kiểm tra ngay");
+                $("#btnPollNow").prop("disabled", false).text("🔄 Kiểm tra ngay");
             }, 800);
         });
     });

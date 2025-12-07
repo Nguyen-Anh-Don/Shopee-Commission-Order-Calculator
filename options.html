@@ -43,21 +43,67 @@
                             <input class="form-check-input" type="checkbox" id="enableNotif" />
                             <label class="form-check-label" for="enableNotif">Bật thông báo tự động (đơn/hoa hồng hôm qua)</label>
                         </div>
+                        
+                        <h4 class="section-title mt-4">Đồng bộ dữ liệu</h4>
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span><strong>Trạng thái đồng bộ:</strong></span>
+                                        <span id="syncStatus" class="badge bg-secondary">Đang tải...</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Lần đồng bộ cuối:</small>
+                                        <div id="lastSyncTime">-</div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Số đơn hàng đã lưu:</small>
+                                        <div id="totalOrdersCount">-</div>
+                                    </div>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button id="syncNowBtn" class="btn btn-primary">Đồng bộ ngay</button>
+                                    <button id="viewHistoryBtn" class="btn btn-info">Xem lịch sử đơn hàng</button>
+                                    <button id="exportCSVBtn" class="btn btn-success">Xuất CSV</button>
+                                    <button id="clearDataBtn" class="btn btn-danger">Xóa toàn bộ dữ liệu</button>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="card">
                             <div class="card-body">
                                 <h6 class="mb-2">Lý do quyền được yêu cầu</h6>
                                 <ul class="mb-0">
                                     <li><b>notifications</b>: hiển thị thông báo khi có đơn/hoa hồng mới hoặc cần đăng nhập lại.</li>
-                                    <li><b>alarms</b>: đặt lịch kiểm tra tự động mỗi 5 phút.</li>
-                                    <li><b>storage</b>: lưu ngày đã thông báo để tránh báo trùng.</li>
+                                    <li><b>alarms</b>: đặt lịch kiểm tra tự động mỗi 5 phút và đồng bộ dữ liệu mỗi 6 giờ.</li>
+                                    <li><b>storage</b>: lưu ngày đã thông báo và lịch sử đơn hàng để tránh báo trùng.</li>
                                     <li><b>host_permissions</b> (affiliate.shopee.vn): đọc dữ liệu để tính hoa hồng chính xác.</li>
                                     <li><b>scripting</b>, <b>activeTab</b>, <b>tabs</b> (nếu dùng): làm việc với tab khi người dùng bấm popup.</li>
+                                    <li><b>contextMenus</b>: hiển thị menu chuột phải để tính toán hoa hồng và xem chi tiết sản phẩm.</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                     <!-- Changelog -->
                     <div class="tab-pane" id="pane-changelog" tabindex="0" role="tabpanel" aria-labelledby="pane-changelog">
+                        <h5 class="section-title">🚀 Cập nhật mới – Bản 2.0.0 (07/12/2025)</h5>
+                        <div class="alert alert-success p-2">
+                            <ul class="mb-2">
+                                <li>🆕 Nâng cấp giao diện <b>chi tiết hoa hồng sản phẩm</b> với các tiện ích mới:
+                                    <ul>
+                                        <li>Hiển thị số lượng <b>Đã bán 30 ngày qua</b> ngay trong popup và bảng sản phẩm.</li>
+                                        <li>Cho biết <b>Mã giảm giá</b> nào áp dụng và bạn nhận được khi khách đặt đơn.</li>
+                                        <li>Tích hợp danh sách <b>Sản phẩm liên quan</b> — xem nhanh các mặt hàng cùng shop hoặc cùng danh mục.</li>
+                                    </ul>
+                                </li>
+                                <li>📦 Hệ thống đồng bộ dữ liệu tự động: đồng bộ đơn hàng mỗi 6 giờ, lưu trữ 30 ngày gần nhất.</li>
+                                <li>📊 Trang lịch sử đơn hàng chi tiết: xem, lọc, thống kê và xuất dữ liệu đơn hàng đã đồng bộ.</li>
+                                <li>🔗 Tạo link tiếp thị liên kết ngay tại Shopee: widget tạo link trực tiếp trên trang Shopee với hỗ trợ 5 subid tùy chỉnh, lưu lịch sử và copy link.</li>
+                                <li>📤 Xuất dữ liệu CSV: xuất lịch sử đơn hàng ra file CSV từ trang cài đặt.</li>
+                                <li>📈 Tính toán thống kê sản phẩm: xem chi tiết thống kê hoa hồng theo sản phẩm qua menu chuột phải.</li>
+                                <li>🎨 Side Panel: giao diện mới với side panel để truy cập nhanh các tính năng.</li>
+                            </ul>
+                        </div>
                         <h5 class="section-title">🚀 Cập nhật mới – Bản 1.6.3 (28/10/2025)</h5>
                         <div class="alert alert-success p-2">
                             <ul class="mb-2">
