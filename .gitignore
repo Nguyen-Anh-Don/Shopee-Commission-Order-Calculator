@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Source files
+src/
+
+# Public files
+public/
+
+# Build files
+build.mjs
+
+# Package files
+package.json
+package-lock.json

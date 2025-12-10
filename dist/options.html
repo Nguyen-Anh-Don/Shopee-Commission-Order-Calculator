@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="utf-8" />
+        <title>Cài đặt</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <link href="/css/bootstrap.min.css" rel="stylesheet" />
+        <style>
+            body {
+                background: #fff;
+            }
+            .sidebar {
+                min-width: 240px;
+                border-right: 1px solid #eee;
+            }
+            .nav-link {
+                border-radius: 8px;
+                cursor: pointer;
+            }
+            .nav-link.active {
+                background: #f36f21;
+                color: #fff;
+            }
+            .container-fluid {
+                max-width: 980px;
+            }
+            .section-title {
+                margin-bottom: 0.75rem;
+            }
+            .tab-pane {
+                display: none;
+            }
+            .tab-pane.active {
+                display: block;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container-fluid py-3">
+            <div class="row g-3">
+                <!-- Sidebar -->
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="sidebar p-3">
+                        <nav class="nav flex-column gap-2" id="sidebarNav" aria-orientation="vertical" role="tablist">
+                            <button class="nav-link active" type="button" data-target="#pane-settings" aria-controls="pane-settings" aria-selected="true">⚙️ Cấu hình</button>
+                            <button class="nav-link" type="button" data-target="#pane-changelog" aria-controls="pane-changelog" aria-selected="false">📝 Cập nhật</button>
+                            <button class="nav-link" type="button" data-target="#pane-tools" aria-controls="pane-links" aria-selected="false">🚀 Tiện ích</button>
+                            <button class="nav-link" type="button" data-target="#pane-posts" aria-controls="pane-links" aria-selected="false">💡 Bài viết</button>
+                            <button class="nav-link" type="button" data-target="#pane-links" aria-controls="pane-links" aria-selected="false">🔗 Liên hệ & Liên kết</button>
+                        </nav>
+                    </div>
+                </div>
+                <!-- Content -->
+                <div class="col-12 col-md-8 col-lg-9">
+                    <div id="sidebarContent" class="ms-2">
+                        <!-- Settings -->
+                        <div class="tab-pane active" id="pane-settings" tabindex="0" role="tabpanel" aria-labelledby="pane-settings">
+                            <h4 class="section-title">Cấu hình thông báo</h4>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="enableNotif" />
+                                <label class="form-check-label" for="enableNotif">Bật thông báo tự động (đơn/hoa hồng hôm qua)</label>
+                            </div>
+
+                            <h4 class="section-title mt-4">Đồng bộ dữ liệu</h4>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span><strong>Trạng thái đồng bộ:</strong></span>
+                                            <span id="syncStatus" class="badge bg-secondary">Đang tải...</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <small class="text-muted">Lần đồng bộ cuối:</small>
+                                            <div id="lastSyncTime">-</div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <small class="text-muted">Số đơn hàng đã lưu:</small>
+                                            <div id="totalOrdersCount">-</div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label"><strong>Khoảng thời gian đồng bộ:</strong></label>
+                                        <select class="form-select" id="syncDays">
+                                            <option value="7">7 ngày gần nhất</option>
+                                            <option value="14">14 ngày gần nhất</option>
+                                            <option value="30">30 ngày gần nhất</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button id="syncNowBtn" class="btn btn-primary">Đồng bộ ngay</button>
+                                        <button id="viewHistoryBtn" class="btn btn-info">Xem lịch sử đơn hàng</button>
+                                        <button id="exportCSVBtn" class="btn btn-success">Xuất CSV</button>
+                                        <button id="clearDataBtn" class="btn btn-danger">Xóa toàn bộ dữ liệu</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="mb-2">Lý do quyền được yêu cầu</h6>
+                                    <ul class="mb-0">
+                                        <li><b>notifications</b>: hiển thị thông báo khi có đơn/hoa hồng mới hoặc cần đăng nhập lại.</li>
+                                        <li><b>alarms</b>: đặt lịch kiểm tra tự động mỗi 5 phút và đồng bộ dữ liệu mỗi 6 giờ.</li>
+                                        <li><b>storage</b>: lưu ngày đã thông báo và lịch sử đơn hàng để tránh báo trùng.</li>
+                                        <li><b>host_permissions</b> (affiliate.shopee.vn): đọc dữ liệu để tính hoa hồng chính xác.</li>
+                                        <li><b>scripting</b>, <b>activeTab</b>, <b>tabs</b> (nếu dùng): làm việc với tab khi người dùng bấm popup.</li>
+                                        <li><b>contextMenus</b>: hiển thị menu chuột phải để tính toán hoa hồng và xem chi tiết sản phẩm.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Changelog -->
+                        <div class="tab-pane" id="pane-changelog" tabindex="0" role="tabpanel" aria-labelledby="pane-changelog">
+                            <h5 class="section-title">🚀 Cập nhật mới – Bản 2.0.0 (07/12/2025)</h5>
+                            <div class="alert alert-success p-2">
+                                <ul class="mb-2">
+                                    <li>
+                                        🆕 Nâng cấp giao diện <b>chi tiết hoa hồng sản phẩm</b> với các tiện ích mới:
+                                        <ul>
+                                            <li>Hiển thị số lượng <b>Đã bán 30 ngày qua</b> ngay trong popup và bảng sản phẩm.</li>
+                                            <li>Cho biết <b>Mã giảm giá</b> nào áp dụng và bạn nhận được khi khách đặt đơn.</li>
+                                            <li>Tích hợp danh sách <b>Sản phẩm liên quan</b> — xem nhanh các mặt hàng cùng shop hoặc cùng danh mục.</li>
+                                        </ul>
+                                    </li>
+                                    <li>📦 Hệ thống đồng bộ dữ liệu tự động: đồng bộ đơn hàng mỗi 6 giờ, lưu trữ 30 ngày gần nhất.</li>
+                                    <li>📊 Trang lịch sử đơn hàng chi tiết: xem, lọc, thống kê và xuất dữ liệu đơn hàng đã đồng bộ.</li>
+                                    <li>🔗 Tạo link tiếp thị liên kết ngay tại Shopee: widget tạo link trực tiếp trên trang Shopee với hỗ trợ 5 subid tùy chỉnh, lưu lịch sử và copy link.</li>
+                                    <li>📤 Xuất dữ liệu CSV: xuất lịch sử đơn hàng ra file CSV từ trang cài đặt.</li>
+                                    <li>📈 Tính toán thống kê sản phẩm: xem chi tiết thống kê hoa hồng theo sản phẩm qua menu chuột phải.</li>
+                                    <li>🎨 Side Panel: giao diện mới với side panel để truy cập nhanh các tính năng.</li>
+                                </ul>
+                            </div>
+                            <h5 class="section-title">🚀 Cập nhật mới – Bản 1.6.3 (28/10/2025)</h5>
+                            <div class="alert alert-success p-2">
+                                <ul class="mb-2">
+                                    <li>🔧 Tối ưu hiệu năng và hoạt động nền, giúp kiểm tra đơn/hoa hồng nhanh & ổn định hơn.</li>
+                                    <li>
+                                        🆕 Thêm công cụ <b>Lọc theo subid</b> để hỗ trợ quản lý hoa hồng theo subid cá nhân.<br />
+                                        <a href="https://goink.me/uQbe" target="_blank" rel="noopener noreferrer">Truy cập công cụ Lọc theo subid</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <h5 class="section-title">🚀 Cập nhật mới – Bản 1.6.2 (22/08/2025)</h5>
+                            <div class="alert alert-info p-2">
+                                <ul class="mb-2">
+                                    <li>🔔 Thông báo tự động khi có đơn/hoa hồng mới của ngày hôm qua.</li>
+                                    <li>⚙️ Tuỳ chọn bật/tắt thông báo theo nhu cầu.</li>
+                                    <li>⏱️ Hiệu năng nhanh hơn & hoạt động ổn định, kể cả khi không có mạng.</li>
+                                </ul>
+                                <strong>📌 Vì sao cần chấp nhận quyền mới?</strong>
+                                <ul class="mb-2">
+                                    <li><b>affiliate.shopee.vn</b> → để tính hoa hồng chính xác theo tài khoản của bạn.</li>
+                                    <li><b>Hiển thị thông báo</b> → để nhắc nhở kịp thời khi có đơn/hoa hồng mới.</li>
+                                </ul>
+                                <strong>🔒 Tiện ích không thu thập dữ liệu người dùng, an toàn để sử dụng.</strong>
+                            </div>
+                        </div>
+                        <!-- Tool -->
+                        <div class="tab-pane" id="pane-tools" tabindex="0" role="tabpanel" aria-labelledby="pane-tools">
+                            <h4 class="section-title">Tiện ích</h4>
+                            <ul class="list-unstyled">
+                                <li>🌐 <a href="https://goink.me/CYWK" target="_blank" rel="noopener noreferrer">Lấy liên kết gốc</a></li>
+                                <li>🌐 <a href="https://goink.me/lpL4" target="_blank" rel="noopener noreferrer">Lấy Affiliate ID</a></li>
+                                <li>🌐 <a href="https://goink.me/u6Ag" target="_blank" rel="noopener noreferrer">Xem lịch sử thanh toán</a></li>
+
+                                <li>🌐 <a href="https://goink.me/Ijro" target="_blank" rel="noopener noreferrer">Xem lịch sử hoa hồng</a></li>
+                                <li>🌐 <a href="https://goink.me/63sL" target="_blank" rel="noopener noreferrer">Xem lịch sử live</a></li>
+                                <li>🌐 <a href="https://goink.me/yenz" target="_blank" rel="noopener noreferrer">Tính Thuế TNCN</a></li>
+                            </ul>
+                            <ul class="list-unstyled">
+                                <li>🎥 <a href="https://goink.me/nf8c" target="_blank" rel="noopener noreferrer">Xuất giỏ phiên Live cũ của bạn</a></li>
+                                <li>🎥 <a href="https://goink.me/LIcU" target="_blank" rel="noopener noreferrer">Lọc giỏ Live để tối ưu giỏ</a></li>
+                                <li>🎥 <a href="https://goink.me/Lvly" target="_blank" rel="noopener noreferrer">BXH sản phẩm Live bán chạy</a></li>
+                            </ul>
+                            <ul class="list-unstyled">
+                                <li>🌐 <a href="https://goink.me/efnM" target="_blank" rel="noopener noreferrer">Tải Video Shopee chất lượng gốc</a></li>
+                                <li>🌐 <a href="https://goink.me/BbEB6" target="_blank" rel="noopener noreferrer">Sản phẩm miễn phí</a></li>
+                                <li>🌐 <a href="https://goink.me/KkN9" target="_blank" rel="noopener noreferrer">BXH sản phẩm Video bán chạy</a></li>
+                            </ul>
+                            <div class="mt-2">
+                                <strong>Xem thêm tài liệu, hướng dẫn, và công cụ tại <a href="http://addlivetag.com/" target="_blank" rel="noopener noreferrer">addlivetag.com</a></strong>
+                            </div>
+                        </div>
+                        <!-- Post -->
+                        <div class="tab-pane" id="pane-posts" tabindex="0" role="tabpanel" aria-labelledby="pane-posts">
+                            <h4 class="section-title">Bài viết</h4>
+                            <ul class="list-unstyled">
+                                <li>💡 <a href="https://goink.me/iX4s" target="_blank" rel="noopener noreferrer">Khởi đầu hành trình trở thành KOL/KOC</a></li>
+                                <li>💡 <a href="https://goink.me/fpLH" target="_blank" rel="noopener noreferrer">Quy trình thanh toán & hướng dẫn cách xem hoa hồng</a></li>
+                            </ul>
+                            <ul class="list-unstyled">
+                                <li>
+                                    💡 Hướng Dẫn Mở Giỏ Hàng Gắn Link Sản Phẩm Trên Video Shopee <a href="https://goink.me/mqEp"> tại đây</a> hoặc <a href="https://muanhanh.info/5xCm"> tại đây</a>
+                                </li>
+                                <li><a href="https://goink.me/HV8QY" _target="_blank">🎥 Thế Nào Là Video Chất Lượng Cao Trên Shopee? So Sánh Với Video Cơ Bản</a></li>
+                                <li><a href="https://goink.me/i54T" _target="_blank">📉 Vì Sao Video Shopee Không Có View? Có Phải Bị “Bóp” Không?</a></li>
+                                <li><a href="https://goink.me/lE1G" _target="_blank">🚀 Lộ Trình Mở Giỏ Hàng Video &amp; Livestream Shopee – Dễ Hay Khó?</a></li>
+                                <li><a href="https://goink.me/KMhy" _target="_blank">🔰 Shopee Affiliate Là Gì? Vì Sao Nên Bắt Đầu Ngay Hôm Nay?</a></li>
+                                <li><a href="https://goink.me/74em" _target="_blank">🚫 Lý Do Bị Xoá Video Hoặc Khóa Tài Khoản Shopee – Và Cách Tránh "Bay Giỏ Hàng"</a></li>
+                                <li><a href="https://goink.me/PQD8" _target="_blank">🛒 Gắn 6 sản phẩm hay chỉ 1? Chiến lược gắn giỏ hàng chuẩn Shopee 2025</a></li>
+                                <li><a href="https://goink.me/ca7t" _target="_blank">🎥 Video dưới 15 = Không được xét chất lượng? Cách đẩy reach để không bị ‘dính điểm xấu’!”</a></li>
+                                <li>
+                                    <a href="https://goink.me/ca7t" _target="_blank"></a
+                                    ><a href="https://goink.me/f9bj" _target="_blank">🔥 Lấy Lại Video Gốc Full HD Không Logo – Bảo Toàn Chất Lượng & Tái Dựng Không Vi Phạm</a>
+                                </li>
+                                <li><a href="https://goink.me/VLUu" _target="_blank">💥 Chỉ Số Ảnh Hưởng Shopee: “Vũ khí bí mật” để tối đa hóa nội dung & doanh thu!</a></li>
+                                <li><a href="https://goink.me/ZoRF" _target="_blank">💥 Chiến lược Quảng Cáo Video Shopee — Từ “Flop” thành “Đỉnh”, thu về đơn đều mỗi ngày!</a></li>
+                                <li><a href="https://goink.me/mzvc" _target="_blank">🐣 Làm thế nào để chọn sản phẩm chạy quảng cáo video Shopee?</a></li>
+                            </ul>
+                        </div>
+                        <!-- Links & Contact -->
+                        <div class="tab-pane" id="pane-links" tabindex="0" role="tabpanel" aria-labelledby="pane-links">
+                            <h4 class="section-title">Liên hệ & Liên kết</h4>
+                            <ul class="list-unstyled">
+                                <li>🌐 <a href="https://goink.me/vvfo" target="_blank" rel="noopener noreferrer">Bản web</a></li>
+                                <li>🌐 <a href="https://goink.me/YcAw" target="_blank" rel="noopener noreferrer">Bản web VIP</a></li>
+                                <li>🧩 <a href="https://goink.me/jhnC" target="_blank" rel="noopener noreferrer">Bản Chrome PC</a></li>
+                                <li>🎥 <a href="https://goink.me/vWgU" target="_blank" rel="noopener noreferrer">Hướng dẫn web</a></li>
+                                <li>🎥 <a href="https://goink.me/Jpeo" target="_blank" rel="noopener noreferrer">Hướng dẫn tiện ích</a></li>
+                            </ul>
+                            <strong>Liên hệ hỗ trợ: <a href="mailto:nguyenanhdon.qn@gmail.com">nguyenanhdon.qn@gmail.com</a></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Scripts (nội bộ, không inline) -->
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/options.js"></script>
+    </body>
+</html>

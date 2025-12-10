@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi" id="mainContainer">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title data-i18n="title">Shopee Commission Calculator</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="css/popup.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="container mt-3" style="min-width: 600px">
+            <button id="captureBtn" title="Chụp ảnh">🌇</button>
+            <h1 class="text-center mb-4" data-i18n="header">Công cụ tính hoa hồng Shopee</h1>
+
+            <div id="result">
+                <div class="row mb-2">
+                    <div class="col-4">
+                        <div class="commission-box total-commission">
+                            <span data-i18n="total">Tổng hoa hồng</span>
+                            <p class="fs-4 mb-0" id="totalCommission">...</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="commission-box xtra-commission">
+                            <span>Xtra</span>
+                            <p class="fs-4 mb-0" id="xtraCommission">...</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="commission-box shopee-commission">
+                            <span>Shopee</span>
+                            <p class="fs-4 mb-0" id="shopeeCommission">...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-12">
+                        <div class="commission-box gmv-commission">
+                            <span>Tổng GMV</span>
+                            <p class="fs-5 mb-0" id="totalGMV">...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-center" data-i18n="date">Ngày: <span id="startDate"></span> <span id="endDate"></span></p>
+
+                <div id="dateWarning" class="alert alert-warning text-center d-none" data-i18n="dateWarning">Bạn đang xem kết quả của nhiều ngày khác nhau.</div>
+
+                <table class="table table-bordered table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th data-i18n="type">Loại đơn hàng</th>
+                            <th data-i18n="count">Số đơn</th>
+                            <th>Hoa hồng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-i18n="all">Tổng</td>
+                            <td id="totalOrders">...</td>
+                            <td id="totalCommissionCell">...</td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="video">Đơn video</td>
+                            <td id="videoOrders">...</td>
+                            <td id="videoCommissionCell">...</td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="live">Đơn live</td>
+                            <td id="liveOrders">...</td>
+                            <td id="liveCommissionCell">...</td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="social">Đơn social</td>
+                            <td id="socialOrders">...</td>
+                            <td id="socialCommissionCell">...</td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="zero">Đơn 0đ</td>
+                            <td id="zeroCommissionOrders">...</td>
+                            <td id="zeroCommissionCell">...</td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="unpaid">Đơn chưa thanh toán</td>
+                            <td id="unpaidOrders">...</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td data-i18n="cancel">Đơn hủy</td>
+                            <td id="canceledOrders">...</td>
+                            <td id="canceledCommissionCell">...</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- <div class="text-center" id="ck-donnguyen">Code by DonNguyen & Lê Tí</div> -->
+
+                <div class="mt-3" id="top-shop-product">
+                    <h6>🏆 Shop có nhiều đơn nhất</h6>
+                    <p id="topShop" style="font-size: 13px">Đang xử lý...</p>
+
+                    <h6 class="mt-3">🔥 Top 5 sản phẩm nổi bật</h6>
+                    <ul id="topProducts" style="padding-left: 20px; font-size: 13px">
+                        <li>Đang xử lý...</li>
+                    </ul>
+                </div>
+
+                <div class="text-center">
+                    <div id="paginationWarning" class="alert alert-danger" data-i18n="pageWarning" style="display: none">Có nhiều hơn 1 trang hiển thị, hãy kéo xuống dưới cùng và chọn trang 1.</div>
+                    <button id="scrollToBottom" class="btn btn-outline-warning" data-i18n="scroll" style="display: none">Cuộn xuống cuối trang</button>
+                </div>
+            </div>
+
+            <div id="addlivetagInfo" class="alert alert-info py-0 px-1 small mb-1" data-i18n="addlivetagInfo" style="display: none">
+                Xem thêm công cụ tại: <a href="https://addlivetag.com/" target="_blank">https://addlivetag.com</a>
+            </div>
+            <div id="CommissionWarning" class="alert alert-danger py-0 px-1 small mb-2" data-i18n="commissionWarning" style="display: none">
+                Tổng hoa hồng chưa trừ đi phí dịch vụ (1%) và quản lý MCN.
+            </div>
+        </div>
+
+        <script src="js/html2canvas.min.js"></script>
+
+        <script src="js/processOrderData.js"></script>
+        <script src="js/popup.js"></script>
+
+        <script src="js/page-popup.js"></script>
+    </body>
+</html>
