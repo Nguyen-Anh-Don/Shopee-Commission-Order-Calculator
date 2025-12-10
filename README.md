@@ -30,7 +30,6 @@ Tiện ích mở rộng Chrome giúp tính hoa hồng và số đơn hàng Shope
 - [Quyền truy cập](#quyền-truy-cập)
 - [Hỗ trợ đa ngôn ngữ](#hỗ-trợ-đa-ngôn-ngữ)
 - [Công nghệ sử dụng](#công-nghệ-sử-dụng)
-- [Cấu trúc dự án](#cấu-trúc-dự-án)
 - [Phát triển](#phát-triển)
 - [Đóng góp](#đóng-góp)
 - [Liên hệ & Hỗ trợ](#liên-hệ--hỗ-trợ)
@@ -131,7 +130,7 @@ Hỗ trợ 5 ngôn ngữ:
 
 1. Tải hoặc clone repository này:
    ```bash
-   git clone https://github.com/yourusername/Shopee-Commission-Order-Calculator.git
+   git clone <repository-url>
    cd Shopee-Commission-Order-Calculator
    ```
 
@@ -284,66 +283,6 @@ Tiện ích tự động phát hiện ngôn ngữ của trình duyệt và hiể
   - `chrome.alarms`
   - `chrome.tabs`
 
-## 📁 Cấu trúc dự án
-
-```
-Shopee-Commission-Order-Calculator/
-│
-├── _locales/                 # File đa ngôn ngữ
-│   ├── en/                  # Tiếng Anh
-│   ├── id/                  # Tiếng Indonesia
-│   ├── ph/                  # Tiếng Filipino
-│   ├── th/                  # Tiếng Thái
-│   └── vi/                  # Tiếng Việt
-│       └── messages.json
-│
-├── _metadata/               # Metadata của extension
-│   └── verified_contents.json
-│
-├── css/                     # File CSS
-│   ├── affiliate-product-offer.css  # CSS cho widget tạo link
-│   ├── bootstrap.min.css
-│   ├── dataTables.bootstrap5.min.css  # DataTables Bootstrap 5
-│   ├── popup.css
-│   └── styles.css
-│
-├── icon/                    # Icon của extension
-│   ├── icon.png
-│   ├── icon16.png
-│   ├── icon32.png
-│   ├── icon48.png
-│   └── icon128.png
-│
-├── js/                      # File JavaScript
-│   ├── affiliate-product-offer.js  # Xử lý widget tạo link trên Shopee
-│   ├── background.js        # Service worker (xử lý nền)
-│   ├── bootstrap.bundle.min.js  # Bootstrap JS
-│   ├── chart.js            # Thư viện biểu đồ
-│   ├── chartjs-plugin-datalabels.min.js  # Plugin cho biểu đồ
-│   ├── content.js          # Content script cho Shopee
-│   ├── dataTables.bootstrap5.min.js  # DataTables Bootstrap 5
-│   ├── html2canvas.min.js  # Thư viện chụp ảnh
-│   ├── injected-product-offer.js  # Script injected cho widget
-│   ├── jquery.dataTables.min.js  # jQuery DataTables
-│   ├── jquery.min.js       # jQuery
-│   ├── offscreen.js        # Xử lý offscreen document
-│   ├── options.js          # Xử lý trang cài đặt
-│   ├── order-history.js    # Xử lý lịch sử đơn hàng
-│   ├── page-popup.js       # Script chạy trên trang
-│   ├── popup.js            # Logic chính của popup
-│   ├── processOrderData.js # Xử lý dữ liệu đơn hàng
-│   └── sidepanel.js        # Xử lý side panel
-│
-├── cover.png               # Ảnh bìa
-├── manifest.json           # File cấu hình extension
-├── offscreen.html         # Trang offscreen
-├── options.html           # Trang cài đặt
-├── order-history.html     # Trang lịch sử đơn hàng
-├── popup.html             # Giao diện popup chính
-├── sidepanel.html        # Giao diện side panel
-└── README.md             # File này
-```
-
 ## 🚀 Phát triển
 
 ### Yêu cầu
@@ -355,7 +294,7 @@ Shopee-Commission-Order-Calculator/
 
 1. Clone repository:
    ```bash
-   git clone https://github.com/yourusername/Shopee-Commission-Order-Calculator.git
+   git clone <repository-url>
    cd Shopee-Commission-Order-Calculator
    ```
 
