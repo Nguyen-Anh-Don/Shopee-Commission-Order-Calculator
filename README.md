@@ -16,6 +16,13 @@ Tiện ích mở rộng Chrome giúp tính hoa hồng và số đơn hàng Shope
 
 ![Tạo link tiếp thị liên kết nhanh](https://upanh.nhatkythuthuat.com/images/2025/12/07/image-2.jpg)
 
+![Click](https://upanh.nhatkythuthuat.com/images/2025/12/11/Click.png)
+
+![Tổng quan click](https://upanh.nhatkythuthuat.com/images/2025/12/11/Tng-quan-click.png)
+
+![Chi tiết click](https://upanh.nhatkythuthuat.com/images/2025/12/11/Chi-tiet-click.png)
+
+
 [![Version](https://img.shields.io/badge/version-2.0.0-orange.svg)](https://github.com)
 [![Chrome Web Store](https://img.shields.io/badge/Chrome-Extension-green.svg)](https://chrome.google.com/webstore)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
