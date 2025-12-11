@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tổng quan Click - Shopee Commission Calculator</title>
+        <link href="/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+        <style>
+            body {
+                background-color: #fffaf5;
+                color: #333;
+                font-family: "Segoe UI", sans-serif;
+            }
+
+            a {
+                text-decoration: none;
+            }
+
+            .filter-section {
+                background-color: white;
+                border-radius: 8px;
+                padding: 8px;
+                margin-bottom: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .stats-card {
+                background-color: white;
+                border-radius: 8px;
+                padding: 8px;
+                margin-bottom: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .table-responsive {
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .loading {
+                text-align: center;
+                padding: 20px;
+            }
+
+            .quick-date-btn.active {
+                background-color: #0d6efd;
+                color: white;
+                border-color: #0d6efd;
+            }
+
+            .quick-date-btn.active:hover {
+                background-color: #0b5ed7;
+                border-color: #0a58ca;
+            }
+
+            .rating-profit {
+                color: #28a745;
+                font-weight: bold;
+            }
+
+            .rating-loss {
+                color: #dc3545;
+                font-weight: bold;
+            }
+
+            .rating-ineffective {
+                color: #ffc107;
+                font-weight: bold;
+            }
+
+            .rating-potential {
+                color: #17a2b8;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container mt-4">
+            <h4 class="text-center mb-2">Tổng quan Click</h4>
+            <div class="text-right mb-2 small text-muted" style="font-size: 13px"><i class="fa-solid fa-chart-line"></i> Phiên bản: v2.0.0</div>
+
+            <div id="loadingMessage" class="loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <p class="mt-2">Đang tải dữ liệu...</p>
+            </div>
+
+            <div id="noDataMessage" class="alert alert-warning" style="display: none">
+                <strong>Chưa có dữ liệu!</strong>
+                <p class="mb-1">Vui lòng đồng bộ dữ liệu click từ trang cài đặt trước.</p>
+                <p class="mb-0 small">Mở <strong>Cài đặt</strong> → <strong>Đồng bộ Click</strong> → Nhấn <strong>Đồng bộ Click ngay</strong></p>
+                <p class="mt-2 mb-0">
+                    <button class="btn btn-sm btn-primary" id="openOptionsBtn">Mở trang cài đặt</button>
+                </p>
+            </div>
+
+            <div id="noFilterResultsMessage" class="alert alert-info p-2" style="display: none">
+                <strong>Không có kết quả!</strong>
+                <p class="mb-0">Không tìm thấy dữ liệu nào phù hợp với bộ lọc bạn đã chọn. Vui lòng thử lại với tiêu chí khác.</p>
+            </div>
+
+            <div id="mainContent" style="display: none">
+                <!-- Phần bộ lọc -->
+                <div class="filter-section">
+                    <form id="filterForm">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="start_date">Thời gian bắt đầu:</label>
+                                    <input type="date" class="form-control form-control-sm" id="start_date" name="start_date" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="start_time">Giờ bắt đầu:</label>
+                                    <input type="time" class="form-control form-control-sm" id="start_time" name="start_time" value="00:00" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="end_date">Thời gian kết thúc:</label>
+                                    <input type="date" class="form-control form-control-sm" id="end_date" name="end_date" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="end_time">Giờ kết thúc:</label>
+                                    <input type="time" class="form-control form-control-sm" id="end_time" name="end_time" value="23:59" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12 mb-2">
+                                <div class="form-group">
+                                    <label class="small">Chọn nhanh:</label>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-outline-primary quick-date-btn" data-days="1">Hôm qua</button>
+                                        <button type="button" class="btn btn-outline-primary quick-date-btn" data-days="7">7 ngày qua</button>
+                                        <button type="button" class="btn btn-outline-primary quick-date-btn" data-days="30">30 ngày qua</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <div class="form-group small">
+                                    <label for="sub_id">Lọc theo Sub ID:</label>
+                                    <input type="text" class="form-control form-control-sm" id="sub_id" name="sub_id" placeholder="Nhập Sub ID" />
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-warning btn-sm btn-block px-3 py-1 mt-2">👉Lọc dữ liệu</button>
+                    </form>
+                </div>
+
+                <!-- Kết quả -->
+                <div class="result mt-4" style="min-width: 600px; position: relative" id="result-capture">
+                    <h4 class="text-center mb-2">Tổng quan Click theo Sub ID</h4>
+
+                    <p class="text-center">Ngày: <span id="startDate"></span> <span id="endDate"></span></p>
+
+                    <!-- Bảng tổng hợp -->
+                    <div class="stats-card">
+                        <h6 class="mb-3">Bảng tổng hợp theo Sub ID</h6>
+                        <div class="table-responsive" style="max-height: 90vh">
+                            <table id="subIdStatsTable" class="table table-bordered table-hover" style="width: 100%">
+                                <thead class="thead-light" style="font-size: 12px; white-space: nowrap">
+                                    <tr>
+                                        <th>Loại</th>
+                                        <th>Sub ID1</th>
+                                        <th>Sub ID2</th>
+                                        <th>Sub ID3</th>
+                                        <th>Sub ID4</th>
+                                        <th>Sub ID5</th>
+                                        <th>Click</th>
+                                        <th>Đơn hàng</th>
+                                        <th>Hoa hồng (₫)</th>
+                                        <th>EPC (₫)</th>
+                                        <th>CVR (%)</th>
+                                        <th>Profit (₫)</th>
+                                        <th>Đánh giá</th>
+                                        <th>Chi tiết</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Modal -->
+        <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailModalTitle">Chi tiết Sub ID</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <h6>Clicks (Tổng: <span id="detailClicksCount">0</span>)</h6>
+                            <div class="table-responsive" style="max-height: 300px">
+                                <table class="table table-sm table-bordered table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Click ID</th>
+                                            <th>Sub ID đầy đủ</th>
+                                            <th>Thời gian Click</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detailClicksList">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div>
+                            <h6>Đơn hàng (Tổng: <span id="detailOrdersCount">0</span>)</h6>
+                            <div class="table-responsive" style="max-height: 300px">
+                                <table class="table table-sm table-bordered table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Order ID</th>
+                                            <th>Sub ID đầy đủ</th>
+                                            <th>Thời gian đơn</th>
+                                            <th class="text-end">Hoa hồng</th>
+                                            <th class="text-end">Giá trị đơn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detailOrdersList">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/jquery.dataTables.min.js"></script>
+        <script src="/js/dataTables.bootstrap5.min.js"></script>
+        <script src="/js/click-overview.js"></script>
+    </body>
+</html>

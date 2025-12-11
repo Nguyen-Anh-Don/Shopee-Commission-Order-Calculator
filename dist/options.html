@@ -88,10 +88,34 @@
                                         </select>
                                     </div>
                                     <div class="d-grid gap-2">
-                                        <button id="syncNowBtn" class="btn btn-primary">Đồng bộ ngay</button>
                                         <button id="viewHistoryBtn" class="btn btn-info">Xem lịch sử đơn hàng</button>
+                                        <button id="syncNowBtn" class="btn btn-primary">Đồng bộ ngay</button>
                                         <button id="exportCSVBtn" class="btn btn-success">Xuất CSV</button>
                                         <button id="clearDataBtn" class="btn btn-danger">Xóa toàn bộ dữ liệu</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h4 class="section-title mt-4">Đồng bộ Click</h4>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span><strong>Trạng thái đồng bộ click:</strong></span>
+                                            <span id="clickSyncStatus" class="badge bg-secondary">Đang tải...</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <small class="text-muted">Lần đồng bộ click cuối:</small>
+                                            <div id="lastClickSyncTime">-</div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <small class="text-muted">Số click đã lưu:</small>
+                                            <div id="totalClicksCount">-</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button id="viewClickOverviewBtn" class="btn btn-info">Xem tổng quan Click</button>
+                                        <button id="syncClicksNowBtn" class="btn btn-primary">Đồng bộ Click ngay</button>
                                     </div>
                                 </div>
                             </div>
