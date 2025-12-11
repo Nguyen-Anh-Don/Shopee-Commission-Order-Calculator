@@ -113,9 +113,23 @@
                                             <div id="totalClicksCount">-</div>
                                         </div>
                                     </div>
+                                    <div class="mb-3">
+                                        <label class="form-label"><strong>Khoảng thời gian đồng bộ click:</strong></label>
+                                        <select class="form-select" id="clickSyncDays">
+                                            <option value="7">7 ngày gần nhất</option>
+                                            <option value="14" selected>14 ngày gần nhất</option>
+                                            <option value="30">30 ngày gần nhất</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label"><strong>Giới hạn tối đa clicks:</strong></label>
+                                        <input type="number" class="form-control" id="maxClicksLimit" min="1" value="50000" />
+                                        <small class="text-muted">Số lượng clicks tối đa sẽ được lưu trữ (mặc định: 50000)</small>
+                                    </div>
                                     <div class="d-grid gap-2">
                                         <button id="viewClickOverviewBtn" class="btn btn-info">Xem tổng quan Click</button>
                                         <button id="syncClicksNowBtn" class="btn btn-primary">Đồng bộ Click ngay</button>
+                                        <button id="clearClickDataBtn" class="btn btn-danger">Xóa dữ liệu click</button>
                                     </div>
                                 </div>
                             </div>
@@ -251,6 +265,7 @@
         </div>
         <!-- Scripts (nội bộ, không inline) -->
         <script src="/js/jquery.min.js"></script>
+        <script src="/js/idb.js"></script>
         <script src="/js/options.js"></script>
     </body>
 </html>
