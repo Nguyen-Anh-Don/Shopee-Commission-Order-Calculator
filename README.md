@@ -435,7 +435,7 @@ Chúng tôi hoan nghênh mọi đóng góp! Vui lòng:
 
 ## 📝 Changelog
 
-### Version 2.2.5 (18/12/2024) - Hiện tại
+### Version 2.2.5 (18/12/2025) - Hiện tại
 
 #### Tính năng mới
 - 📊 **Tổng quan Click (Click Overview)**:
