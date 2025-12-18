@@ -7,7 +7,6 @@
         <link href="/css/bootstrap.min.css" rel="stylesheet" />
         <link href="/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
         <style>
-            
             body {
                 background-color: #fffaf5;
                 color: #333;
@@ -132,7 +131,7 @@
             }
 
             .table-responsive {
-                max-height: 500px;
+                max-height: 80vh;
                 overflow-y: auto;
             }
 
@@ -207,8 +206,8 @@
     </head>
     <body>
         <div class="container mt-4">
-            <h2 class="text-center mb-3">Xem lịch sử đơn hàng</h2>
-            <div class="text-right mb-2 small text-muted" style="font-size: 13px"><i class="fa-solid fa-calendar-days"></i> Phiên bản: v2.0.0</div>
+            <h2 class="h4 text-center mb-3">Xem lịch sử đơn hàng</h2>
+            <div id="common-header"></div>
 
             <div id="loadingMessage" class="loading">
                 <div class="spinner-border text-primary" role="status">
@@ -295,7 +294,14 @@
                                         <option value="sub_id4">sub_id4</option>
                                         <option value="sub_id5">sub_id5</option>
                                     </select>
-                                    <input list="subid_field_list" type="text" class="form-control form-control-sm" id="sub_id_field" name="sub_id_field" placeholder="Nhập hoặc chọn Sub ID theo từng loại" />
+                                    <input
+                                        list="subid_field_list"
+                                        type="text"
+                                        class="form-control form-control-sm"
+                                        id="sub_id_field"
+                                        name="sub_id_field"
+                                        placeholder="Nhập hoặc chọn Sub ID theo từng loại"
+                                    />
                                     <datalist id="subid_field_list"></datalist>
                                     <small class="form-text text-muted">Bạn chỉ cần điền sub_id vào 1 ô: ô trên tìm từ tất cả sub_id, ô dưới chọn loại sub_id cụ thể.</small>
                                 </div>
@@ -307,7 +313,7 @@
 
                 <!-- Kết quả -->
                 <div class="result mt-4" style="min-width: 600px; position: relative" id="result-capture">
-                    <button id="captureBtn" title="Chụp ảnh" style="position: absolute; top: 10px; right: 10px; z-index: 1000;">🌇</button>
+                    <button id="captureBtn" title="Chụp ảnh" style="position: absolute; top: 10px; right: 10px; z-index: 1000">🌇</button>
 
                     <h1 class="text-center mb-4">Công cụ tính hoa hồng Shopee</h1>
 
@@ -328,22 +334,29 @@
                     </ul>
 
                     <div class="tab-content" id="statsTabContent">
+                        <p class="text-center">Ngày: <span id="startDate"></span> <span id="endDate"></span></p>
                         <!-- Tab Tổng quan -->
                         <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
                             <div class="row mb-2">
-                                <div class="col-4">
+                                <div class="col-3">
+                                    <div class="commission-box gmv-commission">
+                                        <span>Tổng GMV</span>
+                                        <p class="fs-5 mb-0" id="totalGmv">0&nbsp;₫</p>
+                                    </div>
+                                </div>
+                                <div class="col-3">
                                     <div class="commission-box total-commission">
                                         <span>Tổng hoa hồng</span>
                                         <p class="fs-4 mb-0" id="totalCommission">0&nbsp;₫</p>
                                     </div>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-3">
                                     <div class="commission-box xtra-commission">
                                         <span>Xtra</span>
                                         <p class="fs-4 mb-0" id="xtraCommission">0&nbsp;₫</p>
                                     </div>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-3">
                                     <div class="commission-box shopee-commission">
                                         <span>Shopee</span>
                                         <p class="fs-4 mb-0" id="shopeeCommission">0&nbsp;₫</p>
@@ -351,16 +364,27 @@
                                 </div>
                             </div>
 
-                            <div class="row mb-2">
-                                <div class="col-12">
-                                    <div class="commission-box gmv-commission">
-                                        <span>Tổng GMV</span>
-                                        <p class="fs-5 mb-0" id="totalGmv">0&nbsp;₫</p>
+                            <!-- Thống kê Click -->
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="commission-box" style="background-color: #e1f5fe; color: #01579b; border-color: #01579b">
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <small>Tổng Click</small>
+                                                <p class="fs-5 mb-0" id="totalClicks">0</p>
+                                            </div>
+                                            <div class="col-4">
+                                                <small>EPC trung bình</small>
+                                                <p class="fs-5 mb-0" id="overallEPC">0&nbsp;₫</p>
+                                            </div>
+                                            <div class="col-4">
+                                                <small>CVR trung bình</small>
+                                                <p class="fs-5 mb-0" id="overallCVR">0%</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <p class="text-center">Ngày: <span id="startDate"></span> <span id="endDate"></span></p>
 
                             <!-- Thống kê đơn -->
                             <table class="table table-bordered table-striped">
@@ -374,7 +398,10 @@
                                 <tbody>
                                     <tr>
                                         <td>Tổng</td>
-                                        <td id="totalOrders">0 (<span id="orderTotal">0</span> - <span class="badge bg-secondary" id="orderZeroBadge">0</span> - <span class="badge bg-danger" id="orderCancelledBadge">0</span>)</td>
+                                        <td id="totalOrders">
+                                            0 (<span id="orderTotal">0</span> - <span class="badge bg-secondary" id="orderZeroBadge">0</span> -
+                                            <span class="badge bg-danger" id="orderCancelledBadge">0</span>)
+                                        </td>
                                         <td id="totalCommissionCell">0&nbsp;₫</td>
                                     </tr>
                                     <tr>
@@ -664,13 +691,24 @@
                         <h6 class="dt-label">Chi tiết đơn hàng</h6>
                         <ul class="nav nav-tabs" id="orderTab" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" id="all-tab" data-bs-toggle="tab" href="#tab-all" role="tab" aria-controls="tab-all" aria-selected="true"> Tất cả (<span id="allOrdersCount">0</span>) </a>
+                                <a class="nav-link active" id="all-tab" data-bs-toggle="tab" href="#tab-all" role="tab" aria-controls="tab-all" aria-selected="true">
+                                    Tất cả (<span id="allOrdersCount">0</span>)
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="pending-tab" data-bs-toggle="tab" href="#tab-pending" role="tab" aria-controls="tab-pending" aria-selected="false"> Đang chờ xử lý </a>
+                                <a class="nav-link" id="pending-tab" data-bs-toggle="tab" href="#tab-pending" role="tab" aria-controls="tab-pending" aria-selected="false">
+                                    Đang chờ xử lý (<span id="pendingOrdersCount">0</span>)
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="cancelled-tab" data-bs-toggle="tab" href="#tab-cancelled" role="tab" aria-controls="tab-cancelled" aria-selected="false"> Đã hủy </a>
+                                <a class="nav-link" id="completed-tab" data-bs-toggle="tab" href="#tab-completed" role="tab" aria-controls="tab-completed" aria-selected="false">
+                                    Đơn hoàn thành (<span id="completedOrdersCount">0</span>)
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="cancelled-tab" data-bs-toggle="tab" href="#tab-cancelled" role="tab" aria-controls="tab-cancelled" aria-selected="false">
+                                    Đã hủy (<span id="cancelledOrdersCount">0</span>)
+                                </a>
                             </li>
                         </ul>
                         <div class="tab-content mt-2 small" id="orderTabContent">
@@ -679,6 +717,7 @@
                                     <table id="orders-table-all" class="table table-bordered table-hover" style="width: 100%">
                                         <thead class="thead-light">
                                             <tr>
+                                                <th>Thao tác</th>
                                                 <th>ID đơn hàng</th>
                                                 <th>Tên Shop</th>
                                                 <th style="min-width: 250px">Tên Item</th>
@@ -703,6 +742,7 @@
                                     <table id="orders-table-pending" class="table table-bordered table-hover" style="width: 100%">
                                         <thead class="thead-light">
                                             <tr>
+                                                <th>Thao tác</th>
                                                 <th>ID đơn hàng</th>
                                                 <th>Tên Shop</th>
                                                 <th style="min-width: 250px">Tên Item</th>
@@ -727,6 +767,32 @@
                                     <table id="orders-table-cancelled" class="table table-bordered table-hover" style="width: 100%">
                                         <thead class="thead-light">
                                             <tr>
+                                                <th>Thao tác</th>
+                                                <th>ID đơn hàng</th>
+                                                <th>Tên Shop</th>
+                                                <th style="min-width: 250px">Tên Item</th>
+                                                <th>Giá(₫)</th>
+                                                <th>Số lượng</th>
+                                                <th>Tổng hoa hồng(₫)</th>
+                                                <th>Trạng thái</th>
+                                                <th>Kênh</th>
+                                                <th>SubID1</th>
+                                                <th>SubID2</th>
+                                                <th>SubID3</th>
+                                                <th>SubID4</th>
+                                                <th>SubID5</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab-completed" role="tabpanel" aria-labelledby="completed-tab">
+                                <div class="table-responsive">
+                                    <table id="orders-table-completed" class="table table-bordered table-hover" style="width: 100%">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Thao tác</th>
                                                 <th>ID đơn hàng</th>
                                                 <th>Tên Shop</th>
                                                 <th style="min-width: 250px">Tên Item</th>
@@ -760,6 +826,8 @@
         <script src="/js/chart.js"></script>
         <script src="/js/chartjs-plugin-datalabels.min.js"></script>
         <script src="/js/html2canvas.min.js"></script>
+        <script src="/js/idb.js"></script>
+        <script src="/js/common-header.js"></script>
         <script src="/js/processOrderData.js"></script>
         <script src="/js/order-history.js"></script>
     </body>

@@ -1,43 +1,4 @@
-// Content script cho trang sản phẩm Shopee
-
-let widgetVisible = false;
-let currentProductId = null;
-let affiliateLinkWidgetVisible = false;
-
-// Đọc product_id từ URL
-function getProductIdFromURL() {
-    const url = new URL(window.location.href);
-
-    // Kiểm tra pattern 1: /product/... trong URL
-    const productMatch = url.pathname.match(/\/product\/(\d+)\/(\d+)/);
-    if (productMatch && productMatch.length > 2) {
-        const shopId = productMatch[1];
-        const productId = productMatch[2];
-        return productId; // Return only productId as per requirement
-    }
-
-    // Kiểm tra pattern 2: -i. trong URL params
-    const patternMatch = url.search.match(/-i\.(\d+)\.(\d+)/);
-    if (patternMatch && patternMatch.length > 2) {
-        const shopId = patternMatch[1];
-        const productId = patternMatch[2];
-        return productId; // Return only productId as per requirement
-    }
-
-    return null; // Return null if no pattern matches
-}
-
-// Tạo widget icon
-function createWidgetIcon() {
-    // Kiểm tra xem đã có widget chưa
-    if (document.getElementById("shopee-commission-widget-icon")) {
-        return;
-    }
-
-    const icon = document.createElement("div");
-    icon.id = "shopee-commission-widget-icon";
-    icon.innerHTML = "💰";
-    icon.style.cssText = `
+(()=>{function x(e,...t){console.log(`[Price Tracking Debug] ${e}`,...t)}var _=!1,T=null,C=!1,J=null,L=null,g=null,f={widgetIcon:null,widgetPanel:null,affiliateLinkIcon:null,affiliateLinkPanel:null,getWidgetIcon:()=>(f.widgetIcon||(f.widgetIcon=document.getElementById("shopee-commission-widget-icon")),f.widgetIcon),getWidgetPanel:()=>(f.widgetPanel||(f.widgetPanel=document.getElementById("shopee-commission-widget-panel")),f.widgetPanel),getAffiliateLinkIcon:()=>(f.affiliateLinkIcon||(f.affiliateLinkIcon=document.getElementById("shopee-link-widget-icon")),f.affiliateLinkIcon),getAffiliateLinkPanel:()=>(f.affiliateLinkPanel||(f.affiliateLinkPanel=document.getElementById("shopee-link-widget-panel")),f.affiliateLinkPanel),clear:()=>{f.widgetIcon=null,f.widgetPanel=null,f.affiliateLinkIcon=null,f.affiliateLinkPanel=null}},E=null,S=null,P=[];function k(){let e=new URL(window.location.href),t=e.pathname.match(/\/product\/(\d+)\/(\d+)/);if(t&&t.length>2){let s=t[1];return t[2]}let o=e.pathname.match(/-i\.(\d+)\.(\d+)/);if(o&&o.length>2){let s=o[1];return o[2]}let n=e.search.match(/-i\.(\d+)\.(\d+)/);if(n&&n.length>2){let s=n[1];return n[2]}return null}function F(){if(f.getWidgetIcon())return;let e=document.createElement("div");e.id="shopee-commission-widget-icon",e.innerHTML="\u{1F4B0}",e.style.cssText=`
         position: fixed;
         bottom: 60px;
         right: 20px;
@@ -54,35 +15,7 @@ function createWidgetIcon() {
         box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         opacity: 0.5;
         transition: transform 0.2s, opacity 0.2s;
-    `;
-
-    icon.addEventListener("mouseenter", () => {
-        icon.style.transform = "scale(1.1)";
-        icon.style.opacity = "1";
-    });
-
-    icon.addEventListener("mouseleave", () => {
-        icon.style.transform = "scale(1)";
-        icon.style.opacity = "0.5";
-    });
-
-    icon.addEventListener("click", () => {
-        toggleWidget();
-    });
-
-    document.body.appendChild(icon);
-}
-
-// Tạo widget panel
-function createWidgetPanel() {
-    // Kiểm tra xem đã có panel chưa
-    if (document.getElementById("shopee-commission-widget-panel")) {
-        return;
-    }
-
-    const panel = document.createElement("div");
-    panel.id = "shopee-commission-widget-panel";
-    panel.style.cssText = `
+    `,e.addEventListener("mouseenter",()=>{e.style.transform="scale(1.1)",e.style.opacity="1"}),e.addEventListener("mouseleave",()=>{e.style.transform="scale(1)",e.style.opacity="0.5"}),e.addEventListener("click",()=>{R()}),document.body.appendChild(e)}function H(){if(f.getWidgetPanel())return;let e=document.createElement("div");e.id="shopee-commission-widget-panel",e.style.cssText=`
         position: fixed;
         bottom: 60px;
         right: 80px;
@@ -95,146 +28,141 @@ function createWidgetPanel() {
         display: none;
         overflow-y: auto;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    `;
-
-    panel.innerHTML = `
+    `,e.innerHTML=`
         <div style="padding: 0.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="margin: 0; font-size: 16px; color: #ee4d2d;">Lịch sử bán hàng</h3>
-            <button id="widget-close-btn" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #999;">×</button>
+            <h3 style="margin: 0; font-size: 16px; color: #ee4d2d;">L\u1ECBch s\u1EED b\xE1n h\xE0ng</h3>
+            <button id="widget-close-btn" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #999;">\xD7</button>
         </div>
-        <div id="widget-content" style="padding: 0.5rem;">
-            <div style="text-align: center; padding: 20px; color: #999;">Đang tải...</div>
+        <div id="widget-content" style="padding: 0.5rem; max-height: 400px; overflow-y: auto;">
+            <div style="text-align: center; padding: 20px; color: #999;">\u0110ang t\u1EA3i...</div>
         </div>
-    `;
-
-    document.body.appendChild(panel);
-
-    // Xử lý nút đóng
-    document.getElementById("widget-close-btn").addEventListener("click", () => {
-        toggleWidget();
-    });
-}
-
-// Hiển thị/ẩn widget
-function toggleWidget() {
-    const panel = document.getElementById("shopee-commission-widget-panel");
-    if (!panel) return;
-
-    widgetVisible = !widgetVisible;
-    panel.style.display = widgetVisible ? "block" : "none";
-
-    if (widgetVisible) {
-        loadProductStats();
-    }
-}
-
-// Load thống kê sản phẩm
-async function loadProductStats() {
-    const productId = getProductIdFromURL();
-    if (!productId) {
-        document.getElementById("widget-content").innerHTML = `
+    `,document.body.appendChild(e),document.getElementById("widget-close-btn").addEventListener("click",()=>{R()})}function R(){let e=f.getWidgetPanel();e&&(_=!_,e.style.display=_?"block":"none",_&&N())}function m(e){let t=f.getWidgetIcon();t&&(e?t.style.display="flex":t.style.display="none")}function q(e){if(!e){m(!1);return}chrome.runtime.sendMessage({type:"CALCULATE_PRODUCT_STATS",productId:e},t=>{if(chrome.runtime.lastError){m(!1);return}if(t&&t.success&&t.stats){let o=t.stats.totalOrders>0;m(o)}else m(!1)})}async function N(){let e=k();if(!e){document.getElementById("widget-content").innerHTML=`
             <div style="text-align: center; padding: 20px; color: #999;">
-                Không tìm thấy ID sản phẩm
+                Kh\xF4ng t\xECm th\u1EA5y ID s\u1EA3n ph\u1EA9m
             </div>
-        `;
-        return;
-    }
-
-    currentProductId = productId;
-
-    // Gọi hàm calculateProductStats từ background
-    chrome.runtime.sendMessage(
-        {
-            type: "CALCULATE_PRODUCT_STATS",
-            productId: productId,
-        },
-        (response) => {
-            if (chrome.runtime.lastError) {
-                document.getElementById("widget-content").innerHTML = `
+        `,m(!1);return}T=e,chrome.runtime.sendMessage({type:"CALCULATE_PRODUCT_STATS",productId:e},t=>{if(chrome.runtime.lastError){document.getElementById("widget-content").innerHTML=`
                 <div style="text-align: center; padding: 20px; color: #f00;">
-                    Lỗi: ${chrome.runtime.lastError.message}
+                    L\u1ED7i: ${chrome.runtime.lastError.message}
                 </div>
-            `;
-                return;
-            }
-
-            if (response && response.success) {
-                console.log("Response:", response);
-                displayProductStats(response.stats);
-            } else {
-                document.getElementById("widget-content").innerHTML = `
+            `,m(!1);return}if(t&&t.success){console.log("Response:",t),j(t.stats);let o=t.stats&&t.stats.totalOrders>0;m(o)}else document.getElementById("widget-content").innerHTML=`
                 <div style="text-align: center; padding: 20px; color: #999;">
-                    ${response?.error || "Không có dữ liệu"}
+                    ${(t==null?void 0:t.error)||"Kh\xF4ng c\xF3 d\u1EEF li\u1EC7u"}
                 </div>
-            `;
-            }
-        }
-    );
-}
-
-// Hiển thị thống kê
-function displayProductStats(stats) {
-    if (!stats || stats.totalOrders === 0) {
-        document.getElementById("widget-content").innerHTML = `
+            `,m(!1)})}function j(e){var o,n,s,i,c,r;if(!e||e.totalOrders===0){document.getElementById("widget-content").innerHTML=`
             <div style="text-align: center; padding: 20px; color: #999;">
-                Chưa có dữ liệu bán hàng cho sản phẩm này
+                Ch\u01B0a c\xF3 d\u1EEF li\u1EC7u b\xE1n h\xE0ng cho s\u1EA3n ph\u1EA9m n\xE0y
             </div>
-        `;
-        return;
-    }
-
-    const html = `
+        `,m(!1);return}let t=`
         <div style="padding: 10px; font-family: Arial, sans-serif;">
             <div style="margin-bottom: 10px;">
-                <span style="font-size: 14px; color: #555;">Tổng số đơn:</span>
-                <span style="font-size: 18px; font-weight: bold; color: #ee4d2d;">${stats.totalOrders}</span>
+                <span style="font-size: 14px; color: #555;">T\u1ED5ng s\u1ED1 \u0111\u01A1n:</span>
+                <span style="font-size: 18px; font-weight: bold; color: #ee4d2d;">${e.totalOrders}</span>
             </div>
             
             <div style="margin-bottom: 10px;">
-                <span style="font-size: 14px; color: #555;">Doanh số:</span>
-                <span style="font-size: 16px; font-weight: bold; color: #333;">${stats.formatted?.totalGMV || "0 ₫"}</span>
+                <span style="font-size: 14px; color: #555;">Doanh s\u1ED1:</span>
+                <span style="font-size: 16px; font-weight: bold; color: #333;">${((o=e.formatted)==null?void 0:o.totalGMV)||"0 \u20AB"}</span>
             </div>
             
             <div style="margin-bottom: 10px;">
-                <span style="font-size: 14px; color: #555;">Hoa hồng:</span>
-                <span style="font-size: 16px; font-weight: bold; color: #333;">${stats.formatted?.totalCommission || "0 ₫"}</span>
+                <span style="font-size: 14px; color: #555;">Hoa h\u1ED3ng:</span>
+                <span style="font-size: 16px; font-weight: bold; color: #333;">${((n=e.formatted)==null?void 0:n.totalCommission)||"0 \u20AB"}</span>
             </div>
             
-            ${stats.lastOrderDate ? `<div style="font-size: 14px; color: #555;">Đơn gần nhất: ${stats.lastOrderDate}, Giá trị đơn: <span style="font-weight: bold; color: #ee4d2d;">${stats.formatted?.lastOrderAmount || "0 ₫"}</span></div>` : ""}
+            ${e.lastOrderDate?`<div style="font-size: 14px; color: #555;">\u0110\u01A1n g\u1EA7n nh\u1EA5t: ${e.lastOrderDate}, Gi\xE1 tr\u1ECB \u0111\u01A1n: <span style="font-weight: bold; color: #ee4d2d;">${((s=e.formatted)==null?void 0:s.lastOrderAmount)||"0 \u20AB"}</span></div>`:""}
             
             <div style="margin-top: 10px; border-top: 1px solid #ddd; padding-top: 10px;">
-                <span style="font-size: 14px; color: #555;">Kênh bán hàng:</span>
+                <span style="font-size: 14px; color: #555;">K\xEAnh b\xE1n h\xE0ng:</span>
                 <div style="display: flex; gap: 8px; margin-top: 5px;">
                     <span style="padding: 4px 6px; background: #e3f2fd; border-radius: 3px; color: #1976d2; font-size: 12px;">
-                        Video: ${stats.channels?.video || 0}
+                        Video: ${((i=e.channels)==null?void 0:i.video)||0}
                     </span>
                     <span style="padding: 4px 6px; background: #fff3e0; border-radius: 3px; color: #f57c00; font-size: 12px;">
-                        Live: ${stats.channels?.live || 0}
+                        Live: ${((c=e.channels)==null?void 0:c.live)||0}
                     </span>
                     <span style="padding: 4px 6px; background: #f3e5f5; border-radius: 3px; color: #7b1fa2; font-size: 12px;">
-                        MXH: ${stats.channels?.social || 0}
+                        MXH: ${((r=e.channels)==null?void 0:r.social)||0}
                     </span>
                 </div>
             </div>
         </div>
-    `;
-
-    document.getElementById("widget-content").innerHTML = html;
-}
-
-// ========== Widget tạo link tiếp thị liên kết ==========
-
-// Tạo widget icon cho link tiếp thị liên kết
-function createAffiliateLinkWidgetIcon() {
-    // Kiểm tra xem đã có widget chưa
-    if (document.getElementById("shopee-link-widget-icon")) {
-        return;
-    }
-
-    const icon = document.createElement("div");
-    icon.id = "shopee-link-widget-icon";
-    icon.innerHTML = "🔗";
-    icon.style.cssText = `
+    `;document.getElementById("widget-content").innerHTML=t}async function w(e,t=0){var c,r;if(!e){console.warn("[Price Tracking] Kh\xF4ng c\xF3 productId");return}if((await chrome.storage.local.get("priceHistoryEnabled")).priceHistoryEnabled===!1){console.log("[Price Tracking] L\u1ECBch s\u1EED gi\xE1 \u0111\xE3 b\u1ECB t\u1EAFt trong c\xE0i \u0111\u1EB7t");return}let n=5,s=2e3;if(t>=n){console.warn(`[Price Tracking] Kh\xF4ng t\xECm th\u1EA5y ph\u1EA7n gi\xE1 sau ${n} l\u1EA7n th\u1EED`);return}if(document.readyState!=="complete"){window.addEventListener("load",()=>{setTimeout(()=>w(e,t),1e3)});return}let i=X();if(!i){t<n&&(console.log(`[Price Tracking] Retry ${t+1}/${n}...`),setTimeout(()=>w(e,t+1),s));return}g&&(g.remove(),g=null),g=Y(),i.parentNode.insertBefore(g,i.nextSibling);try{if(console.log("[Price Tracking] \u0110ang fetch d\u1EEF li\u1EC7u cho productId:",e),typeof SERVER_CONFIG>"u"||!((c=SERVER_CONFIG.priceTracking)!=null&&c.endpoint))throw new Error("Ch\u01B0a c\u1EA5u h\xECnh server URL");let l=V();l&&!l.item_id&&e&&(l.item_id=e);let a=((r=SERVER_CONFIG.priceTracking)==null?void 0:r.defaultDays)||90,d=await new Promise((p,u)=>{chrome.runtime.sendMessage({type:"FETCH_PRICE_TRACKING",itemId:e,days:a,currency:"VND",productData:l||void 0},h=>{chrome.runtime.lastError?u(new Error(chrome.runtime.lastError.message)):h&&h.success?p(h.data):u(new Error((h==null?void 0:h.error)||"Kh\xF4ng th\u1EC3 t\u1EA3i l\u1ECBch s\u1EED gi\xE1"))})});if(!d||!d.prices||d.prices.length===0){ee();return}console.log("[Price Tracking] \u0110\xE3 nh\u1EADn \u0111\u01B0\u1EE3c d\u1EEF li\u1EC7u:",d.prices.length,"\u0111i\u1EC3m"),Z(d,l==null?void 0:l.price)}catch(l){console.error("[Price Tracking] Error:",l),te(l.message)}}function X(){let e=[".jRlVo0",".IFdRIb",".IZPeQz",'section[aria-live="polite"]','[class*="price-container"]'];for(let o of e){let n=document.querySelectorAll(o);for(let s of n){let i=s.textContent||"";if(i.includes("\u20AB")||i.includes("\u0111")){let c=s,r=0;for(;c&&r<6;){if(c.tagName==="DIV"||c.tagName==="SECTION")return c;c=c.parentElement,r++}return s}}}let t=document.querySelectorAll("div, section");for(let o of t)if((o.textContent||"").match(/\d+[.,]\d+\s*₫/))return o.parentElement||o;return null}function Y(){let e=document.createElement("div");return e.id="shopee-price-tracking-container",e.style.cssText=`
+        display: none;
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        padding-bottom: 0.25rem;
+        padding-top: 0.25rem;
+        background: #fff;
+        border-radius: 8px;
+        border: 1px solid #e5e5e5;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    `,e}function Z(e,t=null){if(!g){console.error("[Price Tracking] Container kh\xF4ng t\u1ED3n t\u1EA1i");return}g.style.display="block";let o=formatPriceTrackingForChart(e),n=getPriceStats(e,t),s=`
+        <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                <h3 style="margin: 0; font-size: 14px; font-weight: 400; color: #333; display: flex; align-items: center; gap: 8px;">
+                    L\u1ECBch s\u1EED gi\xE1 c\u1EA3
+                </h3>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button id="price-chart-settings-btn" style="background: none; border: none; color: #999; cursor: pointer; padding: 4px;" title="G\u1EE1 c\xE0i \u0111\u1EB7t">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M6.5 2a.5.5 0 0 1 .5.5V3h2v-.5a.5.5 0 0 1 1 0V3h1.5A1.5 1.5 0 0 1 13 4.5v7A1.5 1.5 0 0 1 11.5 13h-7A1.5 1.5 0 0 1 3 11.5v-7A1.5 1.5 0 0 1 4.5 3H6V2.5a.5.5 0 0 1 .5-.5zM4.5 4a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.5-.5h-7z"/>
+                            <path d="M6.354 6.354a.5.5 0 1 1 .707-.708l1 1 1-1a.5.5 0 1 1 .707.708l-1 1 1 1a.5.5 0 0 1-.707.707l-1-1-1 1a.5.5 0 0 1-.707-.707l1-1-1-1z"/>
+                        </svg>
+                    </button>
+                    <button id="price-chart-expand" style="background: none; border: none; color: #999; cursor: pointer; padding: 4px;" title="Thu g\u1ECDn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="price-chart-content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 0.5rem;">
+                <div style="text-align: center; padding: 5px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 4px; border: 1px solid #90caf9;">
+                    <div style="font-size: 0.5rem; color: #1565c0; margin-bottom: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Th\u1EA5p nh\u1EA5t</div>
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #0d47a1;">${formatPrice(n.min_price)}</div>
+                </div>
+                <div style="text-align: center; padding: 5px; background: linear-gradient(135deg, #ffebee 0%, #ef9a9a 100%); border-radius: 4px; border: 1px solid #e57373;">
+                    <div style="font-size: 0.5rem; color: #c62828; margin-bottom: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Cao nh\u1EA5t</div>
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #b71c1c;">${formatPrice(n.max_price)}</div>
+                </div>
+                <div style="text-align: center; padding: 5px; background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%); border-radius: 4px; border: 1px solid #bdbdbd;">
+                    <div style="font-size: 0.5rem; color: #424242; margin-bottom: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Trung b\xECnh</div>
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #212121;">${formatPrice(n.avg_price)}</div>
+                </div>
+                <div style="text-align: center; padding: 5px; background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%); border-radius: 4px; border: 1px solid #ffb74d;">
+                    <div style="font-size: 0.5rem; color: #e65100; margin-bottom: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Hi\u1EC7n t\u1EA1i</div>
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #e65100;">${formatPrice(n.current_price)}</div>
+                </div>
+            </div>
+            
+            <div style="height: 180px; position: relative; background: #fafafa; border-radius: 6px; padding: 0; margin-bottom: 8px;">
+                <canvas id="shopee-price-tracking-chart" 
+                    data-chart='${JSON.stringify(o).replace(/'/g,"&apos;")}' 
+                    data-stats='${JSON.stringify(n).replace(/'/g,"&apos;")}'></canvas>
+            </div>
+            
+            <div style="text-align: right;">
+                <span style="font-size: 11px; color: #999;">Cung c\u1EA5p b\u1EDFi <strong style="color: #666;">Addlivetag</strong></span>
+            </div>
+        </div>
+    `;g.innerHTML=s,Q(),requestAnimationFrame(()=>{setTimeout(()=>{$()},200)})}function Q(){let e=document.getElementById("price-chart-settings-btn");e&&e.addEventListener("click",()=>{let c=chrome.runtime.getURL("options.html");window.open(c,"_blank")});let t=document.getElementById("price-chart-expand"),o=document.getElementById("price-chart-content"),n=!0;t&&o&&t.addEventListener("click",()=>{n=!n,o.style.display=n?"block":"none",t.innerHTML=n?'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>':'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/></svg>'});let s=document.getElementById("price-chart-period");s&&s.addEventListener("change",c=>{let r=parseInt(c.target.value);console.log("[Price Tracking] Thay \u0111\u1ED5i kho\u1EA3ng th\u1EDDi gian:",r,"ng\xE0y")});let i=document.getElementById("price-alert-btn");i&&(i.addEventListener("mouseenter",()=>{i.style.background="#ee4d2d",i.style.color="white"}),i.addEventListener("mouseleave",()=>{i.style.background="#fff",i.style.color="#ee4d2d"}),i.addEventListener("click",()=>{alert("T\xEDnh n\u0103ng theo d\xF5i gi\xE1 \u0111ang \u0111\u01B0\u1EE3c ph\xE1t tri\u1EC3n!")}))}function $(){if(console.log("[Price Tracking] B\u1EAFt \u0111\u1EA7u t\u1EA1o chart..."),!document.getElementById("shopee-price-tracking-chart")){console.error("[Price Tracking] \u274C Canvas kh\xF4ng t\u1ED3n t\u1EA1i!"),A("Canvas element kh\xF4ng t\xECm th\u1EA5y");return}if(console.log("[Price Tracking] \u2705 Canvas t\u1ED3n t\u1EA1i"),document.querySelector('script[src*="chart.min.js"]'))console.log("[Price Tracking] Chart.js \u0111\xE3 c\xF3"),M();else{console.log("[Price Tracking] \u0110ang inject Chart.js...");let o=document.createElement("script");o.src=chrome.runtime.getURL("js/chart.min.js"),o.onload=()=>{console.log("[Price Tracking] Chart.js loaded"),setTimeout(()=>{M()},500)},o.onerror=()=>{console.error("[Price Tracking] \u274C Kh\xF4ng load \u0111\u01B0\u1EE3c Chart.js"),A("Kh\xF4ng th\u1EC3 load Chart.js")},(document.head||document.documentElement).appendChild(o)}}function M(){console.log("[Price Tracking] Loading chart creation script...");let e=document.getElementById("shopee-price-tracking-chart");if(e){let n=e.hasAttribute("data-chart");console.log("[Price Tracking] Canvas has data attribute:",n)}if(document.querySelector('script[src*="price-chart-creator.js"]')){console.log("[Price Tracking] Script \u0111\xE3 load, trigger event..."),setTimeout(()=>{window.dispatchEvent(new CustomEvent("createPriceChartNow"))},100);return}let o=document.createElement("script");o.src=chrome.runtime.getURL("js/price-chart-creator.js"),o.onload=()=>{console.log("[Price Tracking] \u2705 Chart creation script loaded"),setTimeout(()=>{console.log("[Price Tracking] Dispatching createPriceChartNow event..."),window.dispatchEvent(new CustomEvent("createPriceChartNow"))},100)},o.onerror=()=>{console.error("[Price Tracking] \u274C Kh\xF4ng load \u0111\u01B0\u1EE3c chart creation script"),A("Kh\xF4ng th\u1EC3 load chart script")},(document.head||document.documentElement).appendChild(o)}function ee(){g&&(g.style.display="none",g.innerHTML=`
+            <div style="text-align: center; color: #999; font-size: 0.85rem;">
+                Ch\u01B0a c\xF3 d\u1EEF li\u1EC7u l\u1ECBch s\u1EED gi\xE1 cho s\u1EA3n ph\u1EA9m n\xE0y
+            </div>
+        `)}function te(e){g&&(g.style.display="none",g.innerHTML=`
+            <div style="text-align: center; padding: 20px; color: #f00; font-size: 14px;">
+                \u26A0\uFE0F ${e||"Kh\xF4ng th\u1EC3 t\u1EA3i l\u1ECBch s\u1EED gi\xE1"}
+            </div>
+        `)}function A(e){if(g){g.style.display="none";let t=g.querySelector('div[style*="height: 300px"]');t&&(t.innerHTML=`
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #f44336; font-size: 14px; flex-direction: column; gap: 8px;">
+                    <div>\u26A0\uFE0F ${e||"Kh\xF4ng th\u1EC3 hi\u1EC3n th\u1ECB bi\u1EC3u \u0111\u1ED3"}</div>
+                    <div style="font-size: 12px; color: #999;">D\u1EEF li\u1EC7u th\u1ED1ng k\xEA v\u1EABn hi\u1EC3n th\u1ECB \u1EDF tr\xEAn</div>
+                </div>
+            `)}}typeof window<"u"&&(window.injectPriceTrackingChart=w,window.createPriceChart=$);console.log("[Price Tracking] Module loaded - CSP compliant version");function U(){if(f.getAffiliateLinkIcon())return;let e=document.createElement("div");e.id="shopee-link-widget-icon",e.innerHTML="\u{1F517}",e.style.cssText=`
         position: fixed;
         bottom: 120px;
         right: 20px;
@@ -251,35 +179,7 @@ function createAffiliateLinkWidgetIcon() {
         box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         opacity: 0.5;
         transition: transform 0.2s, opacity 0.2s;
-    `;
-
-    icon.addEventListener("mouseenter", () => {
-        icon.style.transform = "scale(1.1)";
-        icon.style.opacity = "1";
-    });
-
-    icon.addEventListener("mouseleave", () => {
-        icon.style.transform = "scale(1)";
-        icon.style.opacity = "0.5";
-    });
-
-    icon.addEventListener("click", () => {
-        toggleAffiliateLinkWidget();
-    });
-
-    document.body.appendChild(icon);
-}
-
-// Tạo widget panel cho link tiếp thị liên kết
-function createAffiliateLinkWidgetPanel() {
-    // Kiểm tra xem đã có panel chưa
-    if (document.getElementById("shopee-link-widget-panel")) {
-        return;
-    }
-
-    const panel = document.createElement("div");
-    panel.id = "shopee-link-widget-panel";
-    panel.style.cssText = `
+    `,e.addEventListener("mouseenter",()=>{e.style.transform="scale(1.1)",e.style.opacity="1"}),e.addEventListener("mouseleave",()=>{e.style.transform="scale(1)",e.style.opacity="0.5"}),e.addEventListener("click",()=>{K()}),document.body.appendChild(e)}function D(){if(f.getAffiliateLinkPanel())return;let e=document.createElement("div");e.id="shopee-link-widget-panel",e.style.cssText=`
         position: fixed;
         bottom: 60px;
         right: 80px;
@@ -292,12 +192,10 @@ function createAffiliateLinkWidgetPanel() {
         display: none;
         overflow-y: auto;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    `;
-
-    panel.innerHTML = `
+    `,e.innerHTML=`
         <div style="padding: 0.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="margin: 0; font-size: 16px; color: #ee4d2d;">Tạo link tiếp thị liên kết</h3>
-            <button id="affiliate-link-widget-close-btn" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #999;">×</button>
+            <h3 style="margin: 0; font-size: 16px; color: #ee4d2d;">T\u1EA1o link ti\u1EBFp th\u1ECB li\xEAn k\u1EBFt</h3>
+            <button id="affiliate-link-widget-close-btn" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #999;">\xD7</button>
         </div>
         <div id="affiliate-link-widget-content" style="padding: 0.5rem;">
             <div style="margin-bottom: 15px;">
@@ -305,7 +203,7 @@ function createAffiliateLinkWidgetPanel() {
                 <input type="text" id="affiliate-link-url-input" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;" />
             </div>
             <div style="margin-bottom: 10px;">
-                <label style="display: block; margin-bottom: 5px; font-size: 14px; color: #555; font-weight: 500;">Sub_id (tùy chọn):</label>
+                <label style="display: block; margin-bottom: 5px; font-size: 14px; color: #555; font-weight: 500;">Sub_id (t\xF9y ch\u1ECDn):</label>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
                     <input type="text" id="affiliate-link-sub1" placeholder="Sub_id1" style="padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;" />
                     <input type="text" id="affiliate-link-sub2" placeholder="Sub_id2" style="padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;" />
@@ -316,7 +214,8 @@ function createAffiliateLinkWidgetPanel() {
                 </div>
                 <input type="text" id="affiliate-link-sub5" placeholder="Sub_id5" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;" />
             </div>
-            <button id="affiliate-link-create-btn" style="width: 100%; padding: 10px; background: #ee4d2d; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 15px;">Tạo link</button>
+            <button id="affiliate-link-create-btn" style="width: 100%; padding: 10px; background: #ee4d2d; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 10px;">T\u1EA1o link</button>
+            <button id="affiliate-link-commission-detail-btn" style="width: 100%; padding: 10px; background: #f5f5f5; color: #555; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 15px;">Xem chi ti\u1EBFt hoa h\u1ED3ng</button>
             <div id="affiliate-link-result" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
                 <div style="margin-bottom: 10px;">
                     <label style="display: block; margin-bottom: 5px; font-size: 14px; color: #555; font-weight: 500;">Short Link:</label>
@@ -335,437 +234,17 @@ function createAffiliateLinkWidgetPanel() {
             </div>
             <div id="affiliate-link-error" style="display: none; margin-top: 10px; padding: 10px; background: #ffebee; color: #c62828; border-radius: 4px; font-size: 13px;"></div>
             <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
-                <button id="affiliate-link-history-btn" style="width: 100%; padding: 8px; background: #f5f5f5; color: #555; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; cursor: pointer; margin-bottom: 10px;">Lịch sử</button>
+                <button id="affiliate-link-history-btn" style="width: 100%; padding: 8px; background: #f5f5f5; color: #555; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; cursor: pointer; margin-bottom: 10px;">L\u1ECBch s\u1EED</button>
                 <div id="affiliate-link-history-list" style="display: none; max-height: 200px; overflow-y: auto;"></div>
             </div>
         </div>
-    `;
-
-    document.body.appendChild(panel);
-
-    // Xử lý nút đóng
-    document.getElementById("affiliate-link-widget-close-btn").addEventListener("click", () => {
-        toggleAffiliateLinkWidget();
-    });
-
-    // Auto-fill URL khi mở panel
-    const urlInput = document.getElementById("affiliate-link-url-input");
-    if (urlInput) {
-        urlInput.value = window.location.href;
-    }
-
-    // Event handlers sẽ được thêm trong các hàm riêng
-    setupAffiliateLinkHandlers();
-}
-
-// Thiết lập event handlers cho widget link tiếp thị liên kết
-function setupAffiliateLinkHandlers() {
-    // Nút tạo link
-    const createBtn = document.getElementById("affiliate-link-create-btn");
-    if (createBtn) {
-        createBtn.addEventListener("click", handleCreateAffiliateLink);
-    }
-
-    // Nút copy short link
-    const shortCopyBtn = document.getElementById("affiliate-link-short-copy-btn");
-    if (shortCopyBtn) {
-        shortCopyBtn.addEventListener("click", () => {
-            const input = document.getElementById("affiliate-link-short-result");
-            if (input) copyToClipboard(input);
-        });
-    }
-
-    // Nút copy long link
-    const longCopyBtn = document.getElementById("affiliate-link-long-copy-btn");
-    if (longCopyBtn) {
-        longCopyBtn.addEventListener("click", () => {
-            const input = document.getElementById("affiliate-link-long-result");
-            if (input) copyToClipboard(input);
-        });
-    }
-
-    // Nút xem lịch sử
-    const historyBtn = document.getElementById("affiliate-link-history-btn");
-    if (historyBtn) {
-        historyBtn.addEventListener("click", toggleHistoryList);
-    }
-}
-
-// Xử lý tạo link tiếp thị liên kết
-async function handleCreateAffiliateLink() {
-    const urlInput = document.getElementById("affiliate-link-url-input");
-    const resultDiv = document.getElementById("affiliate-link-result");
-    const errorDiv = document.getElementById("affiliate-link-error");
-    const createBtn = document.getElementById("affiliate-link-create-btn");
-
-    if (!urlInput || !resultDiv || !errorDiv || !createBtn) return;
-
-    // Ẩn lỗi và kết quả cũ
-    errorDiv.style.display = "none";
-    resultDiv.style.display = "none";
-
-    const originalLink = urlInput.value.trim();
-
-    // Validate URL
-    if (!originalLink) {
-        showError("Vui lòng nhập URL");
-        return;
-    }
-
-    if (!originalLink.includes("shopee.vn")) {
-        showError("URL phải là trang Shopee (shopee.vn)");
-        return;
-    }
-
-    // Lấy sub IDs
-    const subIds = {
-        subId1: document.getElementById("affiliate-link-sub1")?.value.trim() || "",
-        subId2: document.getElementById("affiliate-link-sub2")?.value.trim() || "",
-        subId3: document.getElementById("affiliate-link-sub3")?.value.trim() || "",
-        subId4: document.getElementById("affiliate-link-sub4")?.value.trim() || "",
-        subId5: document.getElementById("affiliate-link-sub5")?.value.trim() || "",
-    };
-
-    // Disable button và hiển thị loading
-    createBtn.disabled = true;
-    createBtn.textContent = "Đang tạo...";
-
-    try {
-        // Gọi API qua background script
-        chrome.runtime.sendMessage(
-            {
-                type: "CREATE_AFFILIATE_LINK",
-                originalLink: originalLink,
-                subIds: subIds,
-            },
-            (response) => {
-                createBtn.disabled = false;
-                createBtn.textContent = "Tạo link";
-
-                if (chrome.runtime.lastError) {
-                    showError("Lỗi: " + chrome.runtime.lastError.message);
-                    return;
-                }
-
-                if (response && response.success) {
-                    // Hiển thị kết quả
-                    const shortInput = document.getElementById("affiliate-link-short-result");
-                    const longInput = document.getElementById("affiliate-link-long-result");
-
-                    if (shortInput) shortInput.value = response.shortLink || "";
-                    if (longInput) longInput.value = response.longLink || "";
-
-                    resultDiv.style.display = "block";
-
-                    // Lưu vào lịch sử
-                    saveAffiliateLink({
-                        originalLink: originalLink,
-                        subIds: subIds,
-                        shortLink: response.shortLink || "",
-                        longLink: response.longLink || "",
-                    });
-                } else {
-                    let errorMsg = response?.error || "Không thể tạo link";
-                    if (errorMsg === "UNAUTHORIZED") {
-                        errorMsg = "Vui lòng đăng nhập vào https://affiliate.shopee.vn trước";
-                    }
-                    showError(errorMsg);
-                }
-            }
-        );
-    } catch (error) {
-        createBtn.disabled = false;
-        createBtn.textContent = "Tạo link";
-        showError("Lỗi: " + error.message);
-    }
-}
-
-// Hiển thị lỗi
-function showError(message) {
-    const errorDiv = document.getElementById("affiliate-link-error");
-    if (errorDiv) {
-        errorDiv.textContent = message;
-        errorDiv.style.display = "block";
-    }
-}
-
-// Copy vào clipboard
-function copyToClipboard(inputElement) {
-    inputElement.select();
-    inputElement.setSelectionRange(0, 99999); // For mobile devices
-
-    try {
-        document.execCommand("copy");
-        // Hiển thị feedback tạm thời
-        const originalText = inputElement.nextElementSibling?.textContent || "";
-        if (inputElement.nextElementSibling) {
-            inputElement.nextElementSibling.textContent = "Đã copy!";
-            setTimeout(() => {
-                if (inputElement.nextElementSibling) {
-                    inputElement.nextElementSibling.textContent = originalText;
-                }
-            }, 2000);
-        }
-    } catch (err) {
-        console.error("Copy failed:", err);
-    }
-}
-
-// Lưu link vào lịch sử
-async function saveAffiliateLink(linkData) {
-    try {
-        const { affiliateLinkHistory = [] } = await chrome.storage.local.get("affiliateLinkHistory");
-
-        const newLink = {
-            ...linkData,
-            createdAt: new Date().toLocaleString("vi-VN"),
-            timestamp: Date.now(),
-        };
-
-        // Thêm vào đầu mảng
-        affiliateLinkHistory.unshift(newLink);
-
-        // Giới hạn 100 link gần nhất
-        if (affiliateLinkHistory.length > 100) {
-            affiliateLinkHistory.splice(100);
-        }
-
-        await chrome.storage.local.set({ affiliateLinkHistory });
-    } catch (error) {
-        console.error("Error saving affiliate link:", error);
-    }
-}
-
-// Tải lịch sử link
-async function loadAffiliateLinkHistory() {
-    try {
-        const { affiliateLinkHistory = [] } = await chrome.storage.local.get("affiliateLinkHistory");
-        return affiliateLinkHistory;
-    } catch (error) {
-        console.error("Error loading affiliate link history:", error);
-        return [];
-    }
-}
-
-// Toggle hiển thị lịch sử
-async function toggleHistoryList() {
-    const historyList = document.getElementById("affiliate-link-history-list");
-    const historyBtn = document.getElementById("affiliate-link-history-btn");
-
-    if (!historyList || !historyBtn) return;
-
-    if (historyList.style.display === "none" || !historyList.style.display) {
-        // Hiển thị lịch sử
-        const history = await loadAffiliateLinkHistory();
-
-        if (history.length === 0) {
-            historyList.innerHTML = '<div style="padding: 10px; text-align: center; color: #999; font-size: 13px;">Chưa có lịch sử</div>';
-        } else {
-            let html = '<div style="max-height: 300px; overflow-y: auto;">';
-            history.forEach((link, index) => {
-                html += `
-                    <div style="padding: 10px; border-bottom: 1px solid #eee; ${index === history.length - 1 ? "border-bottom: none;" : ""}">
-                        <div style="font-size: 12px; color: #999; margin-bottom: 5px;">${link.createdAt}</div>
-                        <div style="font-size: 12px; color: #555; margin-bottom: 5px; word-break: break-all;">${link.originalLink}</div>
+    `,document.body.appendChild(e),f.affiliateLinkPanel=e;let t=e.querySelector("#affiliate-link-widget-close-btn");if(t){let n=()=>K();t.addEventListener("click",n),P.push({element:t,event:"click",handler:n})}let o=document.getElementById("affiliate-link-url-input");o&&(o.value=window.location.href),ie()}function ie(){let e=document.getElementById("affiliate-link-create-btn");e&&e.addEventListener("click",oe);let t=document.getElementById("affiliate-link-short-copy-btn");t&&t.addEventListener("click",()=>{let i=document.getElementById("affiliate-link-short-result");i&&B(i)});let o=document.getElementById("affiliate-link-long-copy-btn");o&&o.addEventListener("click",()=>{let i=document.getElementById("affiliate-link-long-result");i&&B(i)});let n=document.getElementById("affiliate-link-history-btn");n&&n.addEventListener("click",le);let s=document.getElementById("affiliate-link-commission-detail-btn");s&&s.addEventListener("click",()=>{let i=k();if(i){let c=`https://affiliate.shopee.vn/offer/product_offer/${i}`;window.open(c,"_blank")}else b("Kh\xF4ng t\xECm th\u1EA5y ID s\u1EA3n ph\u1EA9m")})}function ne(e,t=3e4){return new Promise((o,n)=>{let s=setTimeout(()=>{n(new Error("Request timeout. Vui l\xF2ng th\u1EED l\u1EA1i."))},t);chrome.runtime.sendMessage(e,i=>{if(clearTimeout(s),chrome.runtime.lastError){n(new Error(chrome.runtime.lastError.message));return}if(!i){n(new Error("Kh\xF4ng nh\u1EADn \u0111\u01B0\u1EE3c ph\u1EA3n h\u1ED3i t\u1EEB background script"));return}o(i)})})}async function oe(){var c,r,l,a,d;let e=document.getElementById("affiliate-link-url-input"),t=document.getElementById("affiliate-link-result"),o=document.getElementById("affiliate-link-error"),n=document.getElementById("affiliate-link-create-btn");if(!e||!t||!o||!n)return;o.style.display="none",t.style.display="none";let s=e.value.trim();if(!s){b("Vui l\xF2ng nh\u1EADp URL");return}if(!s.includes("shopee.vn")){b("URL ph\u1EA3i l\xE0 trang Shopee (shopee.vn)");return}let i={subId1:((c=document.getElementById("affiliate-link-sub1"))==null?void 0:c.value.trim())||"",subId2:((r=document.getElementById("affiliate-link-sub2"))==null?void 0:r.value.trim())||"",subId3:((l=document.getElementById("affiliate-link-sub3"))==null?void 0:l.value.trim())||"",subId4:((a=document.getElementById("affiliate-link-sub4"))==null?void 0:a.value.trim())||"",subId5:((d=document.getElementById("affiliate-link-sub5"))==null?void 0:d.value.trim())||""};n.disabled=!0,n.textContent="\u0110ang t\u1EA1o...";try{console.log("[Content] G\u1EEDi request CREATE_AFFILIATE_LINK:",s);let p=await ne({type:"CREATE_AFFILIATE_LINK",originalLink:s,subIds:i},6e3);if(console.log("[Content] Nh\u1EADn \u0111\u01B0\u1EE3c response:",p),p.success){let u=document.getElementById("affiliate-link-short-result"),h=document.getElementById("affiliate-link-long-result");u&&(u.value=p.shortLink||""),h&&(h.value=p.longLink||""),t.style.display="block",re({originalLink:s,subIds:i,shortLink:p.shortLink||"",longLink:p.longLink||""})}else{let u=p.error||"Kh\xF4ng th\u1EC3 t\u1EA1o link";u==="UNAUTHORIZED"&&(u="Vui l\xF2ng \u0111\u0103ng nh\u1EADp v\xE0o https://affiliate.shopee.vn tr\u01B0\u1EDBc"),b(u)}}catch(p){console.error("[Content] Error in handleCreateAffiliateLink:",p);let u=p.message||"\u0110\xE3 x\u1EA3y ra l\u1ED7i";u.includes("port closed")||u.includes("message port closed")?b("K\u1EBFt n\u1ED1i b\u1ECB \u0111\xF3ng. Vui l\xF2ng th\u1EED l\u1EA1i ho\u1EB7c ki\u1EC3m tra k\u1EBFt n\u1ED1i."):u.includes("timeout")?b("Y\xEAu c\u1EA7u m\u1EA5t qu\xE1 nhi\u1EC1u th\u1EDDi gian. Vui l\xF2ng th\u1EED l\u1EA1i."):b("L\u1ED7i: "+u)}finally{n.disabled=!1,n.textContent="T\u1EA1o link"}}function b(e){let t=document.getElementById("affiliate-link-error");t&&(t.textContent=e,t.style.display="block")}function B(e){var t;e.select(),e.setSelectionRange(0,99999);try{document.execCommand("copy");let o=((t=e.nextElementSibling)==null?void 0:t.textContent)||"";e.nextElementSibling&&(e.nextElementSibling.textContent="\u0110\xE3 copy!",setTimeout(()=>{e.nextElementSibling&&(e.nextElementSibling.textContent=o)},2e3))}catch(o){console.error("Copy failed:",o)}}async function re(e){try{let t={...e,createdAt:new Date().toLocaleString("vi-VN"),timestamp:Date.now()};await idb.saveAffiliateLink(t),(await idb.getAllAffiliateLinks()).length>100}catch(t){console.error("Error saving affiliate link:",t)}}async function ce(){try{return await idb.getAllAffiliateLinks()||[]}catch(e){return console.error("Error loading affiliate link history:",e),[]}}async function le(){let e=document.getElementById("affiliate-link-history-list"),t=document.getElementById("affiliate-link-history-btn");if(!(!e||!t))if(e.style.display==="none"||!e.style.display){let o=await ce();if(o.length===0)e.innerHTML='<div style="padding: 10px; text-align: center; color: #999; font-size: 13px;">Ch\u01B0a c\xF3 l\u1ECBch s\u1EED</div>';else{let n='<div style="max-height: 300px; overflow-y: auto;">';o.forEach((s,i)=>{n+=`
+                    <div style="padding: 10px; border-bottom: 1px solid #eee; ${i===o.length-1?"border-bottom: none;":""}">
+                        <div style="font-size: 12px; color: #999; margin-bottom: 5px;">${s.createdAt}</div>
+                        <div style="font-size: 12px; color: #555; margin-bottom: 5px; word-break: break-all;">${s.originalLink}</div>
                         <div style="display: flex; gap: 5px; margin-top: 5px;">
-                            <input type="text" value="${link.shortLink || ""}" readonly style="flex: 1; padding: 4px; border: 1px solid #ddd; border-radius: 3px; font-size: 11px; background: #f5f5f5;" />
-                            <button class="history-copy-btn" data-link="${link.shortLink || ""}" style="padding: 4px 8px; background: #4CAF50; color: white; border: none; border-radius: 3px; font-size: 11px; cursor: pointer;">Copy</button>
+                            <input type="text" value="${s.shortLink||""}" readonly style="flex: 1; padding: 4px; border: 1px solid #ddd; border-radius: 3px; font-size: 11px; background: #f5f5f5;" />
+                            <button class="history-copy-btn" data-link="${s.shortLink||""}" style="padding: 4px 8px; background: #4CAF50; color: white; border: none; border-radius: 3px; font-size: 11px; cursor: pointer;">Copy</button>
                         </div>
                     </div>
-                `;
-            });
-            html += "</div>";
-            historyList.innerHTML = html;
-
-            // Thêm event listeners cho các nút copy trong lịch sử
-            historyList.querySelectorAll(".history-copy-btn").forEach((btn) => {
-                btn.addEventListener("click", (e) => {
-                    const link = e.target.getAttribute("data-link");
-                    if (link) {
-                        const tempInput = document.createElement("input");
-                        tempInput.value = link;
-                        document.body.appendChild(tempInput);
-                        tempInput.select();
-                        document.execCommand("copy");
-                        document.body.removeChild(tempInput);
-
-                        e.target.textContent = "Đã copy!";
-                        setTimeout(() => {
-                            e.target.textContent = "Copy";
-                        }, 2000);
-                    }
-                });
-            });
-        }
-
-        historyList.style.display = "block";
-        historyBtn.textContent = "Ẩn lịch sử";
-    } else {
-        // Ẩn lịch sử
-        historyList.style.display = "none";
-        historyBtn.textContent = "Lịch sử";
-    }
-}
-
-// Hiển thị/ẩn widget link tiếp thị liên kết
-function toggleAffiliateLinkWidget() {
-    const panel = document.getElementById("shopee-link-widget-panel");
-    if (!panel) return;
-
-    affiliateLinkWidgetVisible = !affiliateLinkWidgetVisible;
-    panel.style.display = affiliateLinkWidgetVisible ? "block" : "none";
-
-    if (affiliateLinkWidgetVisible) {
-        // Auto-fill URL hiện tại
-        const urlInput = document.getElementById("affiliate-link-url-input");
-        if (urlInput) {
-            urlInput.value = window.location.href;
-        }
-        // Ẩn kết quả và lịch sử khi mở lại
-        document.getElementById("affiliate-link-result").style.display = "none";
-        document.getElementById("affiliate-link-history-list").style.display = "none";
-        document.getElementById("affiliate-link-error").style.display = "none";
-    }
-}
-
-// Lắng nghe message từ background
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.type === "SHOW_PRODUCT_STATS") {
-        const productId = request.productId || getProductIdFromURL();
-        if (productId) {
-            currentProductId = productId;
-            if (!widgetVisible) {
-                toggleWidget();
-            } else {
-                loadProductStats();
-            }
-        }
-        sendResponse({ success: true });
-    }
-    return true;
-});
-
-// Khởi tạo khi trang load
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-} else {
-    init();
-}
-
-function init() {
-    const productId = getProductIdFromURL();
-    if (productId) {
-        createWidgetIcon();
-        createWidgetPanel();
-    }
-
-    // Tạo widget link tiếp thị liên kết chỉ trên các trang https://shopee.vn/... (có path sau domain)
-    const url = new URL(window.location.href);
-    if (url.hostname === "shopee.vn" && url.pathname !== "/" && url.pathname.length > 1) {
-        createAffiliateLinkWidgetIcon();
-        createAffiliateLinkWidgetPanel();
-    }
-
-    // Theo dõi thay đổi URL cho SPA (Shopee không reload trang khi chuyển sản phẩm/mục)
-    setupURLChangeDetection();
-}
-
-// Theo dõi thay đổi URL trong SPA
-function setupURLChangeDetection() {
-    let lastUrl = window.location.href;
-
-    // Lắng nghe sự kiện popstate (back/forward button)
-    window.addEventListener("popstate", handleURLChange);
-
-    // Intercept pushState và replaceState để phát hiện thay đổi URL
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-
-    history.pushState = function (...args) {
-        originalPushState.apply(history, args);
-        setTimeout(handleURLChange, 100); // Delay để đảm bảo DOM đã cập nhật
-    };
-
-    history.replaceState = function (...args) {
-        originalReplaceState.apply(history, args);
-        setTimeout(handleURLChange, 100);
-    };
-
-    // Sử dụng MutationObserver để phát hiện thay đổi URL khi Shopee sử dụng các phương thức khác
-    const observer = new MutationObserver(() => {
-        if (window.location.href !== lastUrl) {
-            lastUrl = window.location.href;
-            handleURLChange();
-        }
-    });
-
-    // Quan sát thay đổi trong document
-    observer.observe(document, {
-        childList: true,
-        subtree: true,
-    });
-
-    // Kiểm tra URL định kỳ (fallback)
-    setInterval(() => {
-        if (window.location.href !== lastUrl) {
-            lastUrl = window.location.href;
-            handleURLChange();
-        }
-    }, 1000);
-}
-
-// Xử lý khi URL thay đổi
-function handleURLChange() {
-    const url = new URL(window.location.href);
-
-    // Kiểm tra và tạo widget link tiếp thị liên kết nếu cần
-    if (url.hostname === "shopee.vn" && url.pathname !== "/" && url.pathname.length > 1) {
-        // Kiểm tra xem icon đã tồn tại chưa
-        if (!document.getElementById("shopee-link-widget-icon")) {
-            createAffiliateLinkWidgetIcon();
-        }
-        // Kiểm tra xem panel đã tồn tại chưa
-        if (!document.getElementById("shopee-link-widget-panel")) {
-            createAffiliateLinkWidgetPanel();
-        } else {
-            // Cập nhật URL input nếu panel đang mở
-            if (affiliateLinkWidgetVisible) {
-                const urlInput = document.getElementById("affiliate-link-url-input");
-                if (urlInput) {
-                    urlInput.value = window.location.href;
-                }
-            }
-        }
-    } else {
-        // Nếu không phải trang hợp lệ, xóa widget nếu có
-        const icon = document.getElementById("shopee-link-widget-icon");
-        const panel = document.getElementById("shopee-link-widget-panel");
-        if (icon) icon.remove();
-        if (panel) panel.remove();
-    }
-
-    // Kiểm tra và tạo widget commission nếu có productId
-    const productId = getProductIdFromURL();
-    if (productId) {
-        if (!document.getElementById("shopee-commission-widget-icon")) {
-            createWidgetIcon();
-        }
-        if (!document.getElementById("shopee-commission-widget-panel")) {
-            createWidgetPanel();
-        }
-        // Cập nhật productId hiện tại
-        if (currentProductId !== productId) {
-            currentProductId = productId;
-            // Nếu widget đang mở, reload stats
-            if (widgetVisible) {
-                loadProductStats();
-            }
-        }
-    } else {
-        // Nếu không có productId, xóa widget commission nếu có
-        const icon = document.getElementById("shopee-commission-widget-icon");
-        const panel = document.getElementById("shopee-commission-widget-panel");
-        if (icon) icon.remove();
-        if (panel) panel.remove();
-    }
-}
+                `}),n+="</div>",e.innerHTML=n,e.querySelectorAll(".history-copy-btn").forEach(s=>{s.addEventListener("click",i=>{let c=i.target.getAttribute("data-link");if(c){let r=document.createElement("input");r.value=c,document.body.appendChild(r),r.select(),document.execCommand("copy"),document.body.removeChild(r),i.target.textContent="\u0110\xE3 copy!",setTimeout(()=>{i.target.textContent="Copy"},2e3)}})})}e.style.display="block",t.textContent="\u1EA8n l\u1ECBch s\u1EED"}else e.style.display="none",t.textContent="L\u1ECBch s\u1EED"}function K(){let e=document.getElementById("shopee-link-widget-panel");if(e&&(C=!C,e.style.display=C?"block":"none",C)){let t=document.getElementById("affiliate-link-url-input");t&&(t.value=window.location.href),document.getElementById("affiliate-link-result").style.display="none",document.getElementById("affiliate-link-history-list").style.display="none",document.getElementById("affiliate-link-error").style.display="none"}}function V(){let e=k();if(!e)return null;let t={item_id:e,item_name:null,category:null,brand:null,image:null,description:null,is_mall:!1,rating:null,rating_count:null,sold:null,price:null,original_price:null,discount:null,liked_count:null,shop_id:null,shop_name:null,shop_avatar:null,shop_rating:null,shop_rating_count:null,shop_joined_date:null,shop_followers:null,shop_products_count:null,extracted_at:new Date().toISOString(),url:window.location.href};try{let o=document.querySelectorAll('script[type="application/ld+json"]'),n=null,s=null;for(let r of o)try{let l=JSON.parse(r.textContent);if(l&&typeof l=="object"&&l["@type"]==="Product"&&(x("[Product Extract] Found Product JSON-LD:",l),s=l,l.productID&&String(l.productID)===String(e))){n=l,x("[Product Extract] Found matching Product JSON-LD with productID:",l.productID);break}}catch(l){x("[Product Extract] Error parsing JSON-LD script:",l)}let i=n||s;if(i){if(x("[Product Extract] Using Product JSON-LD:",i.productID||"no productID"),i.name&&(t.item_name=i.name),i.productID&&(t.item_id=String(i.productID)),i.brand&&(t.brand=i.brand),i.image&&(t.image=typeof i.image=="string"?i.image:i.image[0]),i.aggregateRating&&(i.aggregateRating.ratingValue&&(t.rating=parseFloat(i.aggregateRating.ratingValue)),i.aggregateRating.ratingCount)){let r=i.aggregateRating.ratingCount;t.rating_count=parseInt(typeof r=="string"?r.replace(/[.,]/g,""):r)}if(i.offers){let r=i.offers,l=r["@type"];if(l==="AggregateOffer"){if(r.lowPrice){let a=null;if(typeof r.lowPrice=="string"){let d=r.lowPrice.indexOf("."),p=d!==-1?r.lowPrice.slice(0,d):r.lowPrice;p=p.replace(/,/g,""),a=parseInt(p,10)}else a=Math.round(r.lowPrice);!isNaN(a)&&a>0&&(t.price=a)}if(r.highPrice&&!t.original_price){let a=null;if(typeof r.highPrice=="string"){let d=r.highPrice.indexOf("."),p=d!==-1?r.highPrice.slice(0,d):r.highPrice;p=p.replace(/,/g,""),a=parseInt(p,10)}else a=Math.round(r.highPrice)}}else if(l==="Offer"&&r.price){if(typeof r.price=="string"){let a=r.price.indexOf("."),d=a!==-1?r.price.slice(0,a):r.price;d=d.replace(/,/g,""),t.price=parseInt(d,10)}else t.price=Math.round(r.price);(isNaN(t.price)||t.price<=0)&&(t.price=null)}if(r.seller&&r.seller["@type"]==="Organization"){let a=r.seller;if(a.name&&(t.shop_name=a.name),a.image&&(t.shop_avatar=typeof a.image=="string"?a.image:a.image[0]),a.url){let d=a.url.match(/\/shop\/(\d+)/);d&&(t.shop_id=d[1])}if(a.aggregateRating&&a.aggregateRating["@type"]==="AggregateRating"&&(a.aggregateRating.ratingValue&&(t.shop_rating=parseFloat(a.aggregateRating.ratingValue)),a.aggregateRating.ratingCount)){let d=a.aggregateRating.ratingCount;t.shop_rating_count=parseInt(typeof d=="string"?d.replace(/[.,]/g,""):d)}a.name&&(a.name.includes("Official")||a.name.includes("Mall"))&&(t.is_mall=!0)}r.availability&&r.availability.includes("InStock")}i.description&&(t.description=i.description),i.url&&(t.url=i.url)}let c=document.querySelectorAll('script:not([src]):not([type="application/ld+json"])');for(let r of c){let l=r.textContent||"";if(l.includes('"@type":"Product"')||l.includes("productID")||l.includes("item_id"))try{let a=JSON.parse(l);a&&typeof a=="object"&&z(a,t)}catch{let d=l.match(/\{[\s\S]*"@type"\s*:\s*"Product"[\s\S]*\}/);if(d)try{let p=JSON.parse(d[0]);p&&p["@type"]==="Product"&&z(p,t)}catch{}}}if(typeof window<"u"){let r=window.__INITIAL_STATE__||window.__NEXT_DATA__||window.__PRELOADED_STATE__;if(r)try{let l=typeof r=="string"?JSON.parse(r):r;se(l,t)}catch{}}}catch(o){console.warn("[Product Extract] Error extracting from JSON:",o)}return ae(t),de(t),t.item_id&&String(t.item_id)!==String(e)&&(x(`[Product Extract] Warning: item_id (${t.item_id}) kh\xF4ng kh\u1EDBp v\u1EDBi productId t\u1EEB URL (${e}), reset v\u1EC1 productId t\u1EEB URL`),t.item_id=e),pe(t),t.item_id&&x(`[Product Extract] Final extracted data - item_id: ${t.item_id}, name: ${t.item_name||"N/A"}, price: ${t.price||"N/A"}`),t}function z(e,t){if(!(!e||typeof e!="object")){if(e.name&&!t.item_name&&(t.item_name=e.name),e.productID&&!t.item_id&&(t.item_id=String(e.productID)),e.item_id&&!t.item_id&&(t.item_id=String(e.item_id)),e.price&&!t.price&&(t.price=y(e.price)),e.current_price&&!t.price&&(t.price=y(e.current_price)),e.original_price&&!t.original_price&&(t.original_price=y(e.original_price)),e.price_before_discount&&!t.original_price&&(t.original_price=y(e.price_before_discount)),e.rating&&!t.rating&&(t.rating=parseFloat(e.rating)),e.rating_star&&!t.rating&&(t.rating=parseFloat(e.rating_star)),e.rating_count&&!t.rating_count){let o=e.rating_count;t.rating_count=parseInt(typeof o=="string"?o.replace(/[.,]/g,""):o)}e.sold&&!t.sold&&(t.sold=parseInt(e.sold)),e.historical_sold&&!t.sold&&(t.sold=parseInt(e.historical_sold)),e.liked_count&&!t.liked_count&&(t.liked_count=parseInt(e.liked_count)),e.shopid&&!t.shop_id&&(t.shop_id=String(e.shopid)),e.shop_id&&!t.shop_id&&(t.shop_id=String(e.shop_id)),e.shop_name&&!t.shop_name&&(t.shop_name=e.shop_name),e.is_mall!==void 0&&(t.is_mall=!!e.is_mall)}}function se(e,t){if(!e||typeof e!="object")return;let o=(c,r="")=>{if(!c||typeof c!="object")return null;if(c.item_id||c.itemid||c.product_id||c.productId)return c;for(let l in c)if(l.includes("item")||l.includes("product")||l.includes("detail")){let a=o(c[l],`${r}.${l}`);if(a)return a}return null},n=o(e);n&&((n.name||n.item_name||n.title)&&(t.item_name=n.name||n.item_name||n.title),(n.price||n.current_price)&&(t.price=y(n.price||n.current_price)),(n.price_before_discount||n.original_price)&&(t.original_price=y(n.price_before_discount||n.original_price)),(n.rating||n.rating_star)&&(t.rating=parseFloat(n.rating||n.rating_star)),(n.rating_count||n.rating_count_total)&&(t.rating_count=parseInt(n.rating_count||n.rating_count_total)),(n.sold||n.historical_sold)&&(t.sold=parseInt(n.sold||n.historical_sold)),(n.liked_count||n.like_count)&&(t.liked_count=parseInt(n.liked_count||n.like_count)),(n.shopid||n.shop_id)&&(t.shop_id=String(n.shopid||n.shop_id)),n.is_mall!==void 0&&(t.is_mall=!!n.is_mall),n.catid||n.category_id);let s=c=>{if(!c||typeof c!="object")return null;if(c.shopid||c.shop_id||c.shop_name)return c;for(let r in c)if(r.includes("shop")){let l=s(c[r]);if(l)return l}return null},i=s(e);i&&((i.username||i.shop_name||i.name)&&(t.shop_name=i.username||i.shop_name||i.name),(i.portrait||i.avatar||i.shop_avatar)&&(t.shop_avatar=i.portrait||i.avatar||i.shop_avatar),(i.rating_star||i.rating)&&(t.shop_rating=parseFloat(i.rating_star||i.rating)),(i.rating_count||i.rating_count_total)&&(t.shop_rating_count=parseInt(i.rating_count||i.rating_count_total)),(i.ctime||i.created_time||i.joined_date)&&(t.shop_joined_date=i.ctime||i.created_time||i.joined_date),(i.follower_count||i.followers)&&(t.shop_followers=parseInt(i.follower_count||i.followers)),(i.item_count||i.products_count)&&(t.shop_products_count=parseInt(i.item_count||i.products_count)),i.is_official_shop!==void 0&&(t.is_mall=!!i.is_official_shop))}function ae(e){if(!e.item_name){let t=['h1[class*="product"]','h1[class*="name"]','[class*="product-name"]','[class*="product_title"]','[data-testid*="product-name"]',"h1",".product-name",".product-title"];for(let o of t){let n=document.querySelector(o);if(n&&n.textContent&&n.textContent.trim().length>0){e.item_name=n.textContent.trim();break}}}if(!e.price){let t=['[class*="price"]','[class*="Price"]','[data-testid*="price"]'];for(let o of t){let n=document.querySelectorAll(o);for(let s of n){let i=s.textContent||"";if(i.includes("\u20AB")||i.includes("\u0111")){let c=i.match(/(\d{1,3}(?:[.,]\d{3})*)\s*[₫đ]?\s*[-–—]\s*(\d{1,3}(?:[.,]\d{3})*)\s*[₫đ]/),r=null;if(c){let l=c[1].replace(/[.,]/g,"");r=parseInt(l,10)}else r=y(i);if(r>0){e.price=r;break}}}if(e.price)break}}if(!e.original_price){let t=!1,o=document.querySelectorAll(".jRlVo0");for(let n of o){let i=function(c){if(!c||typeof c!="string")return null;let r=c.match(/(\d{1,3}(?:[.,]\d{3})*)\s*[₫đ]?\s*[-–—]\s*(\d{1,3}(?:[.,]\d{3})*)\s*[₫đ]/);if(r){let a=r[1].replace(/[.,]/g,""),d=parseInt(a,10);if(!isNaN(d)&&d>0)return d}let l=y(c);if(l>0&&l<1e4&&/\d+\.\d{3}[^\d]/.test(c)){let a=c.match(/(\d{1,3}(?:\.\d{3})+)[^\d]/);if(a&&a[1])return parseInt(a[1].replace(/\./g,""),10)}if(l>0&&l<1e4&&/\d+\,\d{3}[^\d]/.test(c)){let a=c.match(/(\d{1,3}(?:\,\d{3})+)[^\d]/);if(a&&a[1])return parseInt(a[1].replace(/\,/g,""),10)}return l},s=Array.from(n.children).filter(c=>c.tagName==="DIV"&&!c.className.includes("shopee-drawer"));if(s.length===2){let c=s[0].textContent||"",r=s[1].textContent||"",l=i(c),a=i(r);if(l>0&&a>0&&a>l){(!e.price||e.price===l)&&(e.price=l),e.original_price=a,t=!0;break}}if(!t&&s.length>1){let c=s.map(r=>({price:i(r.textContent||""),div:r})).filter(({price:r})=>r>0);if(c.length>=2){c.sort((a,d)=>a.price-d.price);let r=c[0].price,l=c[c.length-1].price;if(l>r){(!e.price||e.price===r)&&(e.price=r),e.original_price=l,t=!0;break}}}if(!t&&s.length===1){let r=s[0].textContent||"",l=i(r);if(l>0&&l>(e.price||0)){e.original_price=l,t=!0;break}}}if(!t){let n=document.querySelector(".jRlVo0");if(n){let s=n.querySelector(".IZPeQz.B67UQ0"),i=n.querySelector(".ZA5sW5");if(s&&i){let l=function(p){let u=p.match(/(\d{1,3}(?:[.,]\d{3})*)\s*[₫đ]?\s*[-–—]\s*(\d{1,3}(?:[.,]\d{3})*)\s*[₫đ]/);if(u){let W=u[1].replace(/[.,]/g,""),G=u[2].replace(/[.,]/g,"");return{min:parseInt(W,10),max:parseInt(G,10),isRange:!0}}let h=parseFullPrice(p);return{min:h,max:h,isRange:!1}},c=s.textContent||"",r=i.textContent||"",a=l(c),d=l(r);if(a.min>0&&d.min>0){let p=a.min,u=d.min;u>p?((!e.price||e.price===p)&&(e.price=p),e.original_price=u,t=!0):p>0&&((!e.price||e.price===p)&&(e.price=p),u>p&&(e.original_price=u),t=!0)}}}}if(!t){let s=function(i){let c=y(i);if(c>0&&c<1e4&&/\d+\.\d{3}[^\d]/.test(i)){let r=i.match(/(\d{1,3}(?:\.\d{3})+)[^\d]/);if(r&&r[1])return parseInt(r[1].replace(/\./g,""),10)}if(c>0&&c<1e4&&/\d+\,\d{3}[^\d]/.test(i)){let r=i.match(/(\d{1,3}(?:\,\d{3})+)[^\d]/);if(r&&r[1])return parseInt(r[1].replace(/\,/g,""),10)}return c},n=['[class*="original-price"]','[class*="old-price"]','[class*="before-discount"]','[class*="strike"]'];for(let i of n){let c=document.querySelector(i);if(c){let r=c.textContent||"";if(r.includes("\u20AB")||r.includes("\u0111")){let l=s(r);if(l>0&&l>(e.price||0)){e.original_price=l,t=!0;break}}}}}}if(!e.rating){let t=['[class*="rating"]','[class*="Rating"]','[data-testid*="rating"]','[aria-label*="rating"]'];for(let o of t){let n=document.querySelector(o);if(n){let i=(n.textContent||"").match(/(\d+[.,]?\d*)/);if(i){let c=parseFloat(i[1].replace(",","."));if(c>=0&&c<=5){e.rating=c;break}}}}}if(!e.rating_count){let t=['[class*="rating-count"]','[class*="review-count"]'];for(let o of t){let n=document.querySelector(o);if(n){let i=(n.textContent||"").match(/(\d+[.,]?\d*)/);if(i){e.rating_count=parseInt(i[1].replace(/[.,]/g,""));break}}}}if(!e.sold){let t=document.querySelectorAll("div.aleSBU");for(let o of t){let n=o.textContent||"";if(/đã bán/i.test(n)){let s=null,i=o.querySelector("span");if(i&&i.textContent){let c=i.textContent.trim(),r=c.match(/^([\d.,]+)\s*(k|K|m|M|tr|TR)?\+?$/);if(r){let l=r[1].replace(",","."),a=1,d=r[2]?r[2].toLowerCase():"";if(d==="k"?a=1e3:(d==="m"||d==="tr")&&(a=1e6),s=parseFloat(l)*a,!isNaN(s)&&s>0){e.sold=Math.round(s);break}}else{let l=parseInt(c.replace(/[^\d]/g,""));if(!isNaN(l)&&l>0){e.sold=l;break}}}if(!e.sold){let c=n.match(/đã bán\s*(\d+[.,]?\d*)/i);if(c){e.sold=parseInt(c[1].replace(/[.,]/g,""));break}}}}}if(!e.sold){let t=['[class*="sold"]','[class*="Sold"]','[class*="historical-sold"]'];for(let o of t){let n=document.querySelectorAll(o);for(let s of n){let i=s.textContent||"";if(i.includes("\u0111\xE3 b\xE1n")||i.includes("sold")||i.includes("\u0110\xE3 b\xE1n")){let c=i.match(/(\d+[.,]?\d*)\s*(k|K|m|M|tr|TR)?\+?/);if(c){let r=c[1].replace(",","."),l=1,a=c[2]?c[2].toLowerCase():"";a==="k"?l=1e3:(a==="m"||a==="tr")&&(l=1e6);let d=parseFloat(r)*l;if(!isNaN(d)&&d>0){e.sold=Math.round(d);break}}}}if(e.sold)break}}if(!e.liked_count){let t=document.querySelectorAll("div.rhG6k7");for(let o of t){let n=o.textContent||"";if(/đã thích\s*\(\d+[.,]?\d*\)/i.test(n)){let s=n.match(/đã thích\s*\((\d+[.,]?\d*)\)/i);if(s){e.liked_count=parseInt(s[1].replace(/[.,]/g,""));break}}}if(!e.liked_count){let o=['[class*="like"]','[class*="favorite"]','[class*="wishlist"]'];for(let n of o){let s=document.querySelectorAll(n);for(let i of s){let c=i.textContent||"";if(c.match(/\d+/)){let r=c.match(/(\d+[.,]?\d*)/);if(r){e.liked_count=parseInt(r[1].replace(/[.,]/g,""));break}}}if(e.liked_count)break}}}if(!e.category){let t=['[class*="breadcrumb"]','[class*="category"]','[class*="Category"]','nav[aria-label*="breadcrumb"]'];for(let o of t){let n=document.querySelector(o);if(n){let s=n.querySelectorAll("a");if(s.length>0){let i=Array.from(s).map(c=>{var r;return(r=c.textContent)==null?void 0:r.trim()}).filter(Boolean);if(i.length>0){e.category=i.join(" > ");break}}}}}if(e.is_mall===!1){let t=['[class*="mall"]','[class*="official"]','[class*="verified"]','[title*="Mall"]','[title*="Official"]'];for(let o of t)if(document.querySelector(o)){e.is_mall=!0;break}}}function de(e){var t;if(!e.shop_name){let o=['[class*="shop-name"]','[class*="shopName"]','[class*="seller-name"]','a[href*="/shop/"]'];for(let n of o){let s=document.querySelector(n);if(s){let i=((t=s.textContent)==null?void 0:t.trim())||s.getAttribute("title")||s.getAttribute("aria-label");if(i&&i.length>0&&!i.includes("http")){e.shop_name=i;break}}}}if(!e.shop_avatar){let o=['[class*="shop-avatar"]','[class*="shopAvatar"]','[class*="seller-avatar"]','img[src*="shopee"]'];for(let n of o){let s=document.querySelector(n);if(s&&s.src){e.shop_avatar=s.src;break}}}if(!e.shop_rating){let o=['[class*="shop-rating"]','[class*="seller-rating"]'];for(let n of o){let s=document.querySelector(n);if(s){let c=(s.textContent||"").match(/(\d+[.,]?\d*)/);if(c){let r=parseFloat(c[1].replace(",","."));if(r>=0&&r<=5){e.shop_rating=r;break}}}}}if(!e.shop_followers){let o=document.querySelector(".page-product__shop, section.page-product__shop"),n=!1;if(o){let s=o.querySelectorAll(".YnZi6x");for(let i of s){let c=i.querySelector(".ffHYws"),r=i.querySelector(".Cs6w3G");if(c&&r&&c.textContent&&r.textContent&&/người theo dõi|theo dõi|followers/i.test(c.textContent)){let l=r.textContent.trim(),a=0;if(l.match(/k|K/)?a=parseFloat(l.replace(/[^\d.,]/g,"").replace(",","."))*1e3:l.match(/m|M/)?a=parseFloat(l.replace(/[^\d.,]/g,"").replace(",","."))*1e6:l.match(/tr|TR|Tr/)?a=parseFloat(l.replace(/[^\d.,]/g,"").replace(",","."))*1e6:a=parseInt(l.replace(/[^\d]/g,"")),a>0){e.shop_followers=Math.round(a),n=!0;break}}}}if(!n){let s=['[class*="followers"]','[class*="follower"]'];for(let i of s){let c=document.querySelectorAll(i);for(let r of c){let l=r.textContent||"";if(l.includes("theo d\xF5i")||l.includes("followers")||l.includes("ng\u01B0\u1EDDi theo d\xF5i")){let a=l.match(/([\d.,]+)\s*(k|K|m|M|tr|TR)?/);if(a){let d=a[1].replace(",","."),p=1,u=a[2]?a[2].toLowerCase():"";u==="k"?p=1e3:(u==="m"||u==="tr")&&(p=1e6);let h=parseFloat(d)*p;if(!isNaN(h)&&h>0){e.shop_followers=Math.round(h),n=!0;break}}}}if(e.shop_followers)break}}}if(!e.shop_products_count){let o=!1,n=document.querySelectorAll(".NGzCXN .YnZi6x");for(let s of n){let i=s.querySelector("label");if(i&&i.textContent&&i.textContent.trim().toLowerCase().includes("s\u1EA3n ph\u1EA9m")){let c=s.querySelector("span.Cs6w3G"),r=c?c.textContent.trim():null;if(r){let l=r.match(/^([\d.,]+)\s*(k|K|m|M|tr|TR)?/);if(l){let a=l[1].replace(",","."),d=1,p=l[2]?l[2].toLowerCase():"";p==="k"?d=1e3:(p==="m"||p==="tr")&&(d=1e6);let u=parseFloat(a)*d;if(!isNaN(u)&&u>0){e.shop_products_count=Math.round(u),o=!0;break}}else{let a=parseInt(r.replace(/[^\d]/g,""));if(!isNaN(a)&&a>0){e.shop_products_count=a,o=!0;break}}}}}if(!o){let s=['[class*="products-count"]','[class*="item-count"]'];for(let i of s){let c=document.querySelectorAll(i);for(let r of c){let l=r.textContent||"";if(l.includes("s\u1EA3n ph\u1EA9m")||l.includes("products")){let a=l.match(/(\d+[.,]?\d*)/);if(a){e.shop_products_count=parseInt(a[1].replace(/[.,]/g,"")),o=!0;break}}}if(e.shop_products_count)break}}}if(!e.shop_id){let o=document.querySelector('link[rel="canonical"][href*="-i."]');if(o&&o.href){let n=o.href.match(/-i\.(\d+)\.(\d+)/);n&&(e.shop_id=n[1])}}}function y(e){if(e==null)return null;if(typeof e=="number")return isNaN(e)?null:Math.round(e);let o=e.toString().replace(/[₫đ,]/g,"").replace(/\s/g,"").trim().match(/(\d+(?:\.\d+)?)/);if(o){let n=parseFloat(o[1]);return isNaN(n)?null:Math.round(n)}return null}function pe(e){if(e.original_price&&e.price&&e.original_price>e.price){let t=e.original_price-e.price;e.discount=Math.round(t/e.original_price*100)}e.price&&isNaN(e.price)&&(e.price=null),e.original_price&&isNaN(e.original_price)&&(e.original_price=null),e.rating&&(isNaN(e.rating)||e.rating<0||e.rating>5)&&(e.rating=null),e.sold&&isNaN(e.sold)&&(e.sold=null),e.liked_count&&isNaN(e.liked_count)&&(e.liked_count=null),e.shop_rating&&(isNaN(e.shop_rating)||e.shop_rating<0||e.shop_rating>5)&&(e.shop_rating=null),e.shop_followers&&isNaN(e.shop_followers)&&(e.shop_followers=null),e.shop_products_count&&isNaN(e.shop_products_count)&&(e.shop_products_count=null),e.item_name&&typeof e.item_name=="string"&&(e.item_name=e.item_name.trim()),e.shop_name&&typeof e.shop_name=="string"&&(e.shop_name=e.shop_name.trim()),e.category&&typeof e.category=="string"&&(e.category=e.category.trim())}function v(e=0){let t=k();if(!t)return;let o=5,n=2e3;if(e>=o){console.warn("[Shopee Product] Kh\xF4ng th\u1EC3 extract product data sau "+o+" l\u1EA7n th\u1EED");return}if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{v(e)},1e3)});return}if(document.readyState!=="complete"){window.addEventListener("load",()=>{setTimeout(()=>{v(e)},1e3)});return}let s=V();s?(!s.item_id&&t&&(s.item_id=t),console.log("[Shopee Product] Extracted product data:",s)):e<o&&setTimeout(()=>{v(e+1)},n)}chrome.runtime.onMessage.addListener((e,t,o)=>{if(e.type==="SHOW_PRODUCT_STATS"){let n=k();n&&(T=n,_?N():R()),o({success:!0})}return!0});document.readyState==="loading"?document.addEventListener("DOMContentLoaded",O):O();function O(){let e=k();e&&(F(),H(),q(e));let t=new URL(window.location.href);t.hostname==="shopee.vn"&&t.pathname!=="/"&&t.pathname.length>1&&(U(),D()),fe(),e&&(document.readyState==="complete"?setTimeout(async()=>{v(0),(await chrome.storage.local.get("priceHistoryEnabled")).priceHistoryEnabled!==!1&&w(e,0)},2e3):window.addEventListener("load",()=>{setTimeout(async()=>{v(0),(await chrome.storage.local.get("priceHistoryEnabled")).priceHistoryEnabled!==!1&&w(e,0)},2e3)}))}var I=(()=>{let e=null;return()=>{e&&clearTimeout(e),e=setTimeout(()=>{ge()},300)}})();function fe(){let e=window.location.href,t=()=>{e=window.location.href,I()};window.addEventListener("popstate",t),P.push({element:window,event:"popstate",handler:t});let o=history.pushState,n=history.replaceState;history.pushState=function(...c){o.apply(history,c),e=window.location.href,I()},history.replaceState=function(...c){n.apply(history,c),e=window.location.href,I()};let s=null;E=new MutationObserver(()=>{window.location.href!==e&&(e=window.location.href,s&&clearTimeout(s),s=setTimeout(()=>{I()},500))});let i=document.body||document.documentElement;i&&E.observe(i,{childList:!0,subtree:!0}),S=setInterval(()=>{window.location.href!==e&&(e=window.location.href,I())},2e3)}function ue(){E&&(E.disconnect(),E=null),S&&(clearInterval(S),S=null),P.forEach(({element:e,event:t,handler:o})=>{e.removeEventListener(t,o)}),P=[],f.clear()}function ge(){let e=new URL(window.location.href);if(e.hostname==="shopee.vn"&&e.pathname!=="/"&&e.pathname.length>1){if(f.getAffiliateLinkIcon()||U(),!f.getAffiliateLinkPanel())D();else if(C){let o=f.getAffiliateLinkPanel(),n=o==null?void 0:o.querySelector("#affiliate-link-url-input");n&&(n.value=window.location.href)}}else{let o=f.getAffiliateLinkIcon(),n=f.getAffiliateLinkPanel();o&&(o.remove(),f.affiliateLinkIcon=null),n&&(n.remove(),f.affiliateLinkPanel=null)}let t=k();if(t){if(f.getWidgetIcon()||F(),f.getWidgetPanel()||H(),T!==t){if(g&&(g.remove(),g=null),L){try{L.destroy()}catch{}L=null}J=null,T=t,x(`[Product Extract] Product ID changed to: ${t}`),q(t),_&&N(),setTimeout(async()=>{v(0),(await chrome.storage.local.get("priceHistoryEnabled")).priceHistoryEnabled!==!1&&w(t,0)},2e3)}}else{let o=f.getWidgetIcon(),n=f.getWidgetPanel();o&&(o.remove(),f.widgetIcon=null),n&&(n.remove(),f.widgetPanel=null)}}window.addEventListener("beforeunload",ue);})();

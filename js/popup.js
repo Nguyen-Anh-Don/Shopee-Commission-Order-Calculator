@@ -1,71 +1,58 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // Kiểm tra URL hiện tại
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        const currentUrl = tabs[0].url;
-        const urlPattern = /(\/report\/conversion_report|\/payment\/billing\/conversion_details)/; // Biểu thức chính quy để kiểm tra phần đường dẫn
-
-        if (!urlPattern.test(currentUrl)) {
-            // Xác định domain tương ứng theo ngôn ngữ
-            const lang = navigator.language || navigator.userLanguage;
-            let baseUrl = "https://affiliate.shopee.vn"; // Mặc định là tiếng Việt
-
-            if (lang.startsWith("en")) {
-                baseUrl = "https://affiliate.shopee.com.my"; // hoặc domain quốc tế nếu cần
-            } else if (lang.startsWith("ph")) {
-                baseUrl = "https://affiliate.shopee.ph";
-            } else if (lang.startsWith("id")) {
-                baseUrl = "https://affiliate.shopee.co.id";
-            } else if (lang.startsWith("th")) {
-                baseUrl = "https://affiliate.shopee.co.th";
-            }
-
-            // Tạo đối tượng URL từ domain phù hợp
-            const urlObj = new URL(baseUrl);
-
-            const expectedUrl = `${urlObj.origin}/report/conversion_report`; // Tạo đường dẫn đầy đủ
-            const billingUrl = `${urlObj.origin}/payment/billing`; // Tạo đường dẫn đầy đủ cho trang hóa đơn
-
-            document.getElementById("result").style.display = "none"; // Ẩn kết quả nếu URL không đúng
-            document.getElementById("paginationWarning").style.display = "none"; // Ẩn cảnh báo phân trang nếu URL không đúng
-            document.getElementById("scrollToBottom").style.display = "none"; // Ẩn nút cuộn nếu URL không đúng
-
-            const usageInstructions = `
+(()=>{document.addEventListener("DOMContentLoaded",function(){var $;chrome.tabs.query({active:!0,currentWindow:!0},function(o){let i=o[0].url;if(/(\/report\/conversion_report|\/payment\/billing\/conversion_details)/.test(i))chrome.scripting.executeScript({target:{tabId:o[0].id},function:Y},s=>{if(console.log("Script execution results:",s),!s||!s[0]){console.error("Kh\xF4ng c\xF3 k\u1EBFt qu\u1EA3 t\u1EEB script"),document.getElementById("result").innerHTML=`
+    <div class="alert alert-danger">
+    <strong>L\u1ED7i:</strong> Kh\xF4ng th\u1EC3 l\u1EA5y d\u1EEF li\u1EC7u t\u1EEB trang. Vui l\xF2ng \u0111\u1EA3m b\u1EA3o b\u1EA1n \u0111ang \u1EDF trang b\xE1o c\xE1o \u0111\u01A1n h\xE0ng v\xE0 \u0111\xE3 ch\u1ECDn ng\xE0y.
+    </div>
+    `;return}if(console.log("results[0]:",s[0]),console.log("results[0].result:",s[0].result),!s[0].result){console.error("K\u1EBFt qu\u1EA3 l\xE0 null ho\u1EB7c undefined. results[0]:",s[0]),s[0].error&&console.error("L\u1ED7i t\u1EEB script execution:",s[0].error),document.getElementById("result").innerHTML=`
+    <div class="alert alert-danger">
+    <strong>L\u1ED7i:</strong> Kh\xF4ng t\xECm th\u1EA5y d\u1EEF li\u1EC7u \u0111\u01A1n h\xE0ng. Vui l\xF2ng ki\u1EC3m tra l\u1EA1i:
+    <ul>
+    <li>\u0110\xE3 ch\u1ECDn ng\xE0y v\xE0 nh\u1EA5n "T\xECm ki\u1EBFm" ch\u01B0a?</li>
+    <li>Trang \u0111\xE3 t\u1EA3i xong ch\u01B0a?</li>
+    <li>C\xF3 \u0111\u01A1n h\xE0ng n\xE0o trong kho\u1EA3ng th\u1EDDi gian \u0111\xE3 ch\u1ECDn kh\xF4ng?</li>
+    </ul>
+    <small>M\u1EDF Console (F12) \u0111\u1EC3 xem chi ti\u1EBFt l\u1ED7i.</small>
+    </div>
+    `;return}if(s[0].result.error){console.error("L\u1ED7i t\u1EEB calculateAllPages:",s[0].result.message),document.getElementById("result").innerHTML=`
+    <div class="alert alert-danger">
+    <strong>L\u1ED7i:</strong> ${s[0].result.message||"\u0110\xE3 x\u1EA3y ra l\u1ED7i khi t\xEDnh to\xE1n"}
+    </div>
+    `;return}let{totalCommission:y,xtraCommission:O,shopeeCommission:g,totalGMV:L,totalOrders:B,canceledOrders:p,unpaidOrders:a,videoOrders:b,liveOrders:h,socialOrders:x,zeroCommissionOrders:F,videoCommission:P,liveCommission:r,socialCommission:c,canceledCommission:n,zeroCommission:m,startDate:v,endDate:d,dateWarning:C}=s[0].result;function N(S){if(!S)return"";let T=S.split("-");if(T.length===3){let[_,w,E]=T;return`${_}/${w}/${E}`}return S}function I(S,T,_,w=null){let E=document.getElementById(S);E&&E.parentElement&&(T>0?(E.parentElement.classList.remove(_),w?E.innerHTML=`<span class="${w}">${T}</span>`:E.textContent=T):E.parentElement.classList.add(_))}let V=N(v),D=N(d);v===d?(document.getElementById("startDate").textContent=V,document.getElementById("endDate").textContent=""):(document.getElementById("startDate").textContent=V,document.getElementById("endDate").textContent=` - ${D}`),C?document.getElementById("dateWarning").style.display="block":document.getElementById("dateWarning").style.display="none",document.getElementById("addlivetagInfo").style.display="block",document.getElementById("CommissionWarning").style.display="block",document.getElementById("totalCommission").textContent=y,document.getElementById("xtraCommission").textContent=O,document.getElementById("shopeeCommission").textContent=g,document.getElementById("totalGMV").textContent=L,document.getElementById("totalOrders").innerHTML=B,document.getElementById("canceledOrders").textContent=p,document.getElementById("unpaidOrders").textContent=a,document.getElementById("videoOrders").textContent=b,document.getElementById("liveOrders").textContent=h,document.getElementById("socialOrders").textContent=x,document.getElementById("zeroCommissionOrders").textContent=F,document.getElementById("totalCommissionCell").textContent=y,document.getElementById("videoCommissionCell").textContent=P,document.getElementById("liveCommissionCell").textContent=r,document.getElementById("socialCommissionCell").textContent=c,document.getElementById("zeroCommissionCell").textContent=m,document.getElementById("canceledCommissionCell").textContent=n,I("canceledOrders",p,"d-none","badge bg-danger"),I("unpaidOrders",a,"d-none","badge bg-secondary"),I("videoOrders",b,"d-none"),I("liveOrders",h,"d-none"),I("socialOrders",x,"d-none"),I("zeroCommissionOrders",F,"d-none","badge bg-warning text-dark"),s[0].result.allOrders&&Q(s[0].result.allOrders)}),document.getElementById("scrollToBottom").addEventListener("click",function(){chrome.scripting.executeScript({target:{tabId:o[0].id},function:j})});else{let s=navigator.language||navigator.userLanguage,y="https://affiliate.shopee.vn";s.startsWith("en")?y="https://affiliate.shopee.com.my":s.startsWith("ph")?y="https://affiliate.shopee.ph":s.startsWith("id")?y="https://affiliate.shopee.co.id":s.startsWith("th")&&(y="https://affiliate.shopee.co.th");let O=new URL(y),g=`${O.origin}/report/conversion_report`,L=`${O.origin}/payment/billing`;document.getElementById("result").style.display="none",document.getElementById("paginationWarning").style.display="none",document.getElementById("scrollToBottom").style.display="none";let B=`
     <div class="alert alert-info mx-2 mb-1 p-1 small" style="border-left: 3px solid #0dcaf0;">
-        <h6 class="alert-heading small mb-1">📋 Hướng dẫn sử dụng</h6>
-        <p class="mb-0 small">Để sử dụng công cụ tính hoa hồng, vui lòng làm theo các bước sau:</p>
+        <h6 class="alert-heading small mb-1">\u{1F4CB} H\u01B0\u1EDBng d\u1EABn s\u1EED d\u1EE5ng</h6>
+        <p class="mb-0 small">\u0110\u1EC3 s\u1EED d\u1EE5ng c\xF4ng c\u1EE5 t\xEDnh hoa h\u1ED3ng, vui l\xF2ng l\xE0m theo c\xE1c b\u01B0\u1EDBc sau:</p>
     </div>
     
     <div class="card mb-3 mx-2 small">
         <div class="card-body p-2">
-            <h6 class="card-title mb-2 p-0">🔹 Các bước thực hiện:</h6>
+            <h6 class="card-title mb-0 p-0">\u{1F539} C\xE1c b\u01B0\u1EDBc th\u1EF1c hi\u1EC7n:</h6>
             <ol class="mb-0" style="padding-left: 1.5rem;">
                 <li class="mb-1">
-                    <strong>Truy cập trang báo cáo:</strong>
-                    <a href="${expectedUrl}" target="_blank" class="btn btn-sm btn-primary mt-1">
-                        ${expectedUrl}
+                    <strong>Truy c\u1EADp trang b\xE1o c\xE1o:</strong>
+                    <a href="${g}" target="_blank" class="btn btn-sm btn-primary p-0">
+                        ${g}
                     </a>
-                    <br>hoặc trang đối soát
-                    <a href="${billingUrl}" target="_blank" class="btn btn-sm btn-secondary mt-1">
-                        ${billingUrl}
+                    <br>ho\u1EB7c trang \u0111\u1ED1i so\xE1t
+                    <a href="${L}" target="_blank" class="btn btn-sm btn-secondary p-0">
+                        ${L}
                     </a>
                 </li>
                 <li class="mb-1">
-                    <strong>Bật thông tin bổ sung:</strong><br>
-                    Nhấn vào biểu tượng <span class="badge bg-secondary">⚙️</span> <strong>hình răng cưa</strong> ở góc phải trên và bật tùy chọn <strong>"Thông tin bổ sung"</strong>
+                    <strong>B\u1EADt th\xF4ng tin b\u1ED5 sung:</strong><br>
+                    Nh\u1EA5n v\xE0o bi\u1EC3u t\u01B0\u1EE3ng <span class="badge bg-secondary">\u2699\uFE0F</span> <strong>h\xECnh r\u0103ng c\u01B0a</strong> \u1EDF g\xF3c ph\u1EA3i tr\xEAn v\xE0 b\u1EADt t\xF9y ch\u1ECDn <strong>"Th\xF4ng tin b\u1ED5 sung"</strong>
                 </li>
                 <li class="mb-1">
-                    <strong>Chọn ngày cần xem:</strong> Chọn ngày bạn muốn xem kết quả. 
-                    <div class="alert alert-warning mt-2 mb-0 py-2" style="font-size: 0.85rem;">
-                        <strong>💡 Lưu ý:</strong> Nếu không thể chọn ngày hôm qua, hãy chọn ngày hôm kia trước, sau đó nhấn "Tìm kiếm". Lúc này, hệ thống sẽ cho phép bạn chọn lại ngày hôm qua.
+                    <strong>Ch\u1ECDn ng\xE0y c\u1EA7n xem:</strong> Ch\u1ECDn ng\xE0y b\u1EA1n mu\u1ED1n xem k\u1EBFt qu\u1EA3. 
+                    <div class="alert alert-warning mt-2 mb-0 py-0 px-1" style="font-size: 0.85rem;">
+                        <strong>\u{1F4A1} L\u01B0u \xFD:</strong> N\u1EBFu kh\xF4ng th\u1EC3 ch\u1ECDn ng\xE0y h\xF4m qua, h\xE3y ch\u1ECDn ng\xE0y h\xF4m kia tr\u01B0\u1EDBc, sau \u0111\xF3 nh\u1EA5n "T\xECm ki\u1EBFm". L\xFAc n\xE0y, h\u1EC7 th\u1ED1ng s\u1EBD cho ph\xE9p b\u1EA1n ch\u1ECDn l\u1EA1i ng\xE0y h\xF4m qua.
                     </div>
                 </li>
                 <li class="mb-1">
-                    <strong>Lọc dữ liệu:</strong><br>
-                    Nhấn nút <span class="badge bg-success">🔍 Tìm kiếm</span> để lọc dữ liệu đơn hàng
+                    <strong>L\u1ECDc d\u1EEF li\u1EC7u:</strong><br>
+                    Nh\u1EA5n n\xFAt <span class="badge bg-success">\u{1F50D} T\xECm ki\u1EBFm</span> \u0111\u1EC3 l\u1ECDc d\u1EEF li\u1EC7u \u0111\u01A1n h\xE0ng
                 </li>
                 <li class="mb-0">
-                    <strong>Xem kết quả:</strong><br>
-                    Cuối cùng, bấm vào biểu tượng tiện ích <span class="badge bg-primary">💰</span> ở góc trình duyệt để xem kết quả tính toán
+                    <strong>Xem k\u1EBFt qu\u1EA3:</strong><br>
+                    Cu\u1ED1i c\xF9ng, b\u1EA5m v\xE0o bi\u1EC3u t\u01B0\u1EE3ng ti\u1EC7n \xEDch <span class="badge bg-primary">\u{1F4B0}</span> \u1EDF g\xF3c tr\xECnh duy\u1EC7t \u0111\u1EC3 xem k\u1EBFt qu\u1EA3 t\xEDnh to\xE1n
                 </li>
             </ol>
         </div>
@@ -73,13 +60,13 @@ document.addEventListener("DOMContentLoaded", function () {
     
     <div class="card mb-3 mx-2">
         <div class="card-body p-2">
-            <h6 class="card-title mb-2">🧰 Chức năng bổ sung:</h6>
+            <h6 class="card-title mb-2">\u{1F9F0} Ch\u1EE9c n\u0103ng b\u1ED5 sung:</h6>
             <div class="d-grid gap-2">
                 <a href="/order-history.html" target="_blank" class="btn btn-outline-primary btn-sm">
-                    📦 Xem lịch sử đơn hàng
+                    \u{1F4E6} Xem l\u1ECBch s\u1EED \u0111\u01A1n h\xE0ng
                 </a>
                 <a href="/options.html" target="_blank" class="btn btn-outline-info btn-sm">
-                    ⚙️ Cấu hình
+                    \u2699\uFE0F C\u1EA5u h\xECnh
                 </a>
             </div>
         </div>
@@ -87,16 +74,16 @@ document.addEventListener("DOMContentLoaded", function () {
     
     <div class="card mb-3 mx-2">
         <div class="card-body p-2">
-            <h6 class="card-title mb-2">📚 Tài liệu & Hỗ trợ:</h6>
+            <h6 class="card-title mb-2">\u{1F4DA} T\xE0i li\u1EC7u & H\u1ED7 tr\u1EE3:</h6>
             <div class="d-grid gap-2">
                 <a href="https://goink.me/MjsU" target="_blank" class="btn btn-outline-primary btn-sm">
-                    🎥 Video hướng dẫn chi tiết
+                    \u{1F3A5} Video h\u01B0\u1EDBng d\u1EABn chi ti\u1EBFt
                 </a>
                 <a href="https://goink.me/ul2i" target="_blank" class="btn btn-outline-info btn-sm">
-                    👥 Tham gia nhóm cộng đồng
+                    \u{1F465} Tham gia nh\xF3m c\u1ED9ng \u0111\u1ED3ng
                 </a>
                 <a href="https://goink.me/9enf" target="_blank" class="btn btn-outline-warning btn-sm">
-                    ⭐ VIP: Lọc theo SubID
+                    \u2B50 VIP: L\u1ECDc theo SubID
                 </a>
             </div>
         </div>
@@ -104,856 +91,16 @@ document.addEventListener("DOMContentLoaded", function () {
     
     <div class="alert alert-light border mb-3 mx-2 p-2 small" style="font-size: 0.85rem;">
         <div class="d-flex align-items-center mb-2">
-            <span class="me-2">🌐</span>
-            <strong>Xem thêm công cụ tại:</strong>
+            <span class="me-2">\u{1F310}</span>
+            <strong>Xem th\xEAm c\xF4ng c\u1EE5 t\u1EA1i:</strong>
         </div>
         <a href="https://addlivetag.com/" target="_blank" class="text-decoration-none">https://addlivetag.com</a>
     </div>
-    `;
-
-            document.body.innerHTML += usageInstructions; // Thêm hướng dẫn sử dụng vào cuối nội dung
-        } else {
-            // Nếu URL đúng, tính tổng hoa hồng và hiển thị kết quả
-            chrome.scripting.executeScript(
-                {
-                    target: { tabId: tabs[0].id },
-                    function: calculateAllPages,
-                },
-                (results) => {
-                    // Kiểm tra kết quả và xử lý lỗi
-                    console.log("Script execution results:", results);
-
-                    if (!results || !results[0]) {
-                        console.error("Không có kết quả từ script");
-                        document.getElementById("result").innerHTML = `
-    <div class="alert alert-danger">
-    <strong>Lỗi:</strong> Không thể lấy dữ liệu từ trang. Vui lòng đảm bảo bạn đang ở trang báo cáo đơn hàng và đã chọn ngày.
+    <div class="alert alert-success mb-3 mx-2 p-2 small" style="font-size: 0.89rem;">
+        \u{1F31F} N\u1EBFu ti\u1EC7n \xEDch n\xE0y gi\xFAp b\u1EA1n ti\u1EBFt ki\u1EC7m th\u1EDDi gian hay t\u1ED1i \u01B0u c\xF4ng vi\u1EC7c, m\xECnh r\u1EA5t mong nh\u1EADn \u0111\u01B0\u1EE3c m\u1ED9t v\xE0i l\u1EDDi nh\u1EADn x\xE9t, \u0111\xE1nh gi\xE1 tr\xEAn Chrome Web Store.<br>
+        \u1EE6ng h\u1ED9 b\u1EB1ng m\u1ED9t <strong>\u0111\xE1nh gi\xE1 5 sao</strong> t\u1EEB b\u1EA1n s\u1EBD l\xE0 \u0111\u1ED9ng l\u1EF1c \u0111\u1EC3 m\xECnh ti\u1EBFp t\u1EE5c ph\xE1t tri\u1EC3n th\xEAm nhi\u1EC1u t\xEDnh n\u0103ng m\u1EDBi! \u{1F64F}<br>
+        <a href="https://chromewebstore.google.com/detail/shopee-commission-order-c/eodhlockngfflpnhmohlfeaniklalabb" target="_blank" class="btn btn-sm btn-primary mt-2" rel="noopener noreferrer">
+            \u2728 \u0110\xE1nh gi\xE1 ti\u1EC7n \xEDch tr\xEAn Chrome Web Store
+        </a>
     </div>
-    `;
-                        return;
-                    }
-
-                    console.log("results[0]:", results[0]);
-                    console.log("results[0].result:", results[0].result);
-
-                    if (!results[0].result) {
-                        console.error("Kết quả là null hoặc undefined. results[0]:", results[0]);
-                        // Kiểm tra xem có lỗi trong quá trình thực thi không
-                        if (results[0].error) {
-                            console.error("Lỗi từ script execution:", results[0].error);
-                        }
-                        document.getElementById("result").innerHTML = `
-    <div class="alert alert-danger">
-    <strong>Lỗi:</strong> Không tìm thấy dữ liệu đơn hàng. Vui lòng kiểm tra lại:
-    <ul>
-    <li>Đã chọn ngày và nhấn "Tìm kiếm" chưa?</li>
-    <li>Trang đã tải xong chưa?</li>
-    <li>Có đơn hàng nào trong khoảng thời gian đã chọn không?</li>
-    </ul>
-    <small>Mở Console (F12) để xem chi tiết lỗi.</small>
-    </div>
-    `;
-                        return;
-                    }
-
-                    // Kiểm tra nếu có lỗi trong kết quả
-                    if (results[0].result.error) {
-                        console.error("Lỗi từ calculateAllPages:", results[0].result.message);
-                        document.getElementById("result").innerHTML = `
-    <div class="alert alert-danger">
-    <strong>Lỗi:</strong> ${results[0].result.message || "Đã xảy ra lỗi khi tính toán"}
-    </div>
-    `;
-                        return;
-                    }
-
-                    const {
-                        totalCommission,
-                        xtraCommission,
-                        shopeeCommission,
-                        totalGMV,
-                        totalOrders,
-                        canceledOrders,
-                        unpaidOrders,
-                        videoOrders,
-                        liveOrders,
-                        socialOrders,
-                        zeroCommissionOrders,
-                        videoCommission,
-                        liveCommission,
-                        socialCommission,
-                        canceledCommission,
-                        zeroCommission,
-                        startDate,
-                        endDate,
-                        dateWarning,
-                    } = results[0].result;
-
-                    // Hàm format lại ngày
-                    function formatDate(dateString) {
-                        if (!dateString) return "";
-
-                        // Tách chuỗi theo dấu gạch ngang
-                        const parts = dateString.split("-");
-
-                        // Đảm bảo có đủ 3 phần
-                        if (parts.length === 3) {
-                            const [day, month, year] = parts;
-                            return `${day}/${month}/${year}`;
-                        }
-
-                        return dateString;
-                    }
-
-                    // Hàm hiển thị hoặc ẩn dòng và cập nhật nội dung dựa trên giá trị
-                    function displayOrderRow(elementId, value, hiddenClass, badgeClass = null) {
-                        const el = document.getElementById(elementId);
-                        if (el && el.parentElement) {
-                            if (value > 0) {
-                                el.parentElement.classList.remove(hiddenClass);
-                                if (badgeClass) {
-                                    el.innerHTML = `<span class="${badgeClass}">${value}</span>`;
-                                } else {
-                                    el.textContent = value;
-                                }
-                            } else {
-                                el.parentElement.classList.add(hiddenClass);
-                            }
-                        }
-                    }
-
-                    const startDateFormatted = formatDate(startDate);
-                    const endDateFormatted = formatDate(endDate);
-
-                    if (startDate === endDate) {
-                        document.getElementById("startDate").textContent = startDateFormatted;
-                        document.getElementById("endDate").textContent = "";
-                    } else {
-                        document.getElementById("startDate").textContent = startDateFormatted;
-                        document.getElementById("endDate").textContent = ` - ${endDateFormatted}`;
-                    }
-
-                    // Hiển thị cảnh báo nếu các ngày khác nhau
-                    if (dateWarning) {
-                        document.getElementById("dateWarning").style.display = "block";
-                    } else {
-                        document.getElementById("dateWarning").style.display = "none";
-                    }
-
-                    document.getElementById("addlivetagInfo").style.display = "block";
-                    document.getElementById("CommissionWarning").style.display = "block";
-
-                    document.getElementById("totalCommission").textContent = totalCommission;
-                    document.getElementById("xtraCommission").textContent = xtraCommission;
-                    document.getElementById("shopeeCommission").textContent = shopeeCommission;
-                    document.getElementById("totalGMV").textContent = totalGMV;
-                    document.getElementById("totalOrders").innerHTML = totalOrders;
-                    document.getElementById("canceledOrders").textContent = canceledOrders;
-                    document.getElementById("unpaidOrders").textContent = unpaidOrders;
-                    document.getElementById("videoOrders").textContent = videoOrders;
-                    document.getElementById("liveOrders").textContent = liveOrders;
-                    document.getElementById("socialOrders").textContent = socialOrders;
-                    document.getElementById("zeroCommissionOrders").textContent = zeroCommissionOrders;
-
-                    // Cập nhật các ô hoa hồng theo loại đơn
-                    document.getElementById("totalCommissionCell").textContent = totalCommission;
-                    document.getElementById("videoCommissionCell").textContent = videoCommission;
-                    document.getElementById("liveCommissionCell").textContent = liveCommission;
-                    document.getElementById("socialCommissionCell").textContent = socialCommission;
-                    document.getElementById("zeroCommissionCell").textContent = zeroCommission;
-                    document.getElementById("canceledCommissionCell").textContent = canceledCommission;
-
-                    // Hiển thị hoặc ẩn dòng
-                    displayOrderRow("canceledOrders", canceledOrders, "d-none", "badge bg-danger");
-                    displayOrderRow("unpaidOrders", unpaidOrders, "d-none", "badge bg-secondary");
-                    displayOrderRow("videoOrders", videoOrders, "d-none");
-                    displayOrderRow("liveOrders", liveOrders, "d-none");
-                    displayOrderRow("socialOrders", socialOrders, "d-none");
-                    displayOrderRow("zeroCommissionOrders", zeroCommissionOrders, "d-none", "badge bg-warning text-dark");
-
-                    if (results[0].result.allOrders) {
-                        showTopShopAndProducts(results[0].result.allOrders);
-                    }
-                }
-            );
-
-            // Thêm sự kiện cho nút cuộn xuống cuối trang
-            document.getElementById("scrollToBottom").addEventListener("click", function () {
-                chrome.scripting.executeScript({
-                    target: { tabId: tabs[0].id },
-                    function: scrollToBottom,
-                });
-            });
-        }
-    });
-
-    // Thêm xử lý sự kiện cho nút chụp ảnh
-    document.getElementById("captureBtn")?.addEventListener("click", async function () {
-        try {
-            // Ẩn phần tử trước khi chụp
-            const captureBtn = document.getElementById("captureBtn");
-            captureBtn.style.visibility = "hidden";
-
-            const topShopProduct = document.getElementById("top-shop-product");
-            topShopProduct.style.display = "none";
-
-            // Ẩn CommissionWarning
-            const commissionWarning = document.getElementById("CommissionWarning");
-            if (commissionWarning) {
-                commissionWarning.style.display = "none";
-            }
-
-            await new Promise((resolve) => setTimeout(resolve, 200));
-
-            // Chụp toàn bộ container
-            const canvas = await html2canvas(document.documentElement, {
-                backgroundColor: "#ffffff",
-                scale: 2,
-                logging: false,
-                useCORS: true,
-            });
-
-            // Chuyển canvas thành blob
-            canvas.toBlob(async function (blob) {
-                try {
-                    // Copy ảnh vào clipboard
-                    const clipboardItem = new ClipboardItem({ "image/png": blob });
-                    await navigator.clipboard.write([clipboardItem]);
-
-                    // Hiện thông báo thành công
-                    const toast = document.createElement("div");
-                    toast.className = "toast-notification";
-                    toast.textContent = "Đã copy ảnh vào bộ nhớ đệm!";
-                    document.body.appendChild(toast);
-
-                    // Xóa toast sau khi animation kết thúc
-                    setTimeout(() => {
-                        document.body.removeChild(toast);
-                    }, 2000);
-                } catch (error) {
-                    console.error("Error copying to clipboard:", error);
-                    alert("Không thể copy ảnh vào bộ nhớ đệm. Vui lòng thử lại.");
-                }
-
-                // Hiện lại sau khi chụp
-                captureBtn.style.visibility = "visible";
-                topShopProduct.style.display = "block";
-                commissionWarning.style.display = "block";
-            }, "image/png");
-        } catch (error) {
-            console.error("Error capturing screenshot:", error);
-            alert("Có lỗi khi chụp ảnh. Vui lòng thử lại.");
-            document.getElementById("captureBtn").style.visibility = "visible";
-        }
-    });
-});
-
-// Hàm cuộn xuống cuối trang
-function scrollToBottom() {
-    window.scrollTo(0, document.body.scrollHeight);
-}
-
-function truncateText(text, maxLength) {
-    if (!text) return "";
-    return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
-}
-
-// Hàm hiển thị shop và sản phẩm top
-function showTopShopAndProducts(allOrders) {
-    const shopCount = {};
-    const shopCommission = {};
-    const productCount = {};
-    const productInfo = {};
-
-    allOrders.forEach((order) => {
-        order.orders.forEach((o) => {
-            const shopName = o.items[0].shop_name || "Không rõ shop";
-            shopCount[shopName] = (shopCount[shopName] || 0) + 1;
-            shopCommission[shopName] = (shopCommission[shopName] || 0) + parseInt(o.items[0].item_commission || 0);
-
-            o.items.forEach((item) => {
-                console.log("item_id:", item.item_id, "name:", item.item_name, "commission:", item.item_commission, "ref:", item.referrer);
-
-                const itemKey = `${item.item_id}`;
-                productCount[itemKey] = (productCount[itemKey] || 0) + 1;
-
-                if (!productInfo[itemKey]) {
-                    productInfo[itemKey] = {
-                        name: item.item_name || "Sản phẩm không rõ",
-                        ref: item.referrer || "Không rõ",
-                        commission: parseInt(item.item_commission || 0),
-                    };
-                } else {
-                    productInfo[itemKey].commission += parseInt(item.item_commission || 0);
-                }
-            });
-        });
-    });
-
-    // Top 3 shop
-    const sortedShops = Object.keys(shopCount).sort((a, b) => shopCount[b] - shopCount[a]);
-    const top3Shops = sortedShops.slice(0, 3);
-    const shopListHtml = top3Shops
-        .map((shop) => {
-            const count = shopCount[shop];
-            const commission = shopCommission[shop];
-            return `${shop} — <strong>${count} đơn, ${commission.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</strong>`;
-        })
-        .join("<br>");
-    document.getElementById("topShop").innerHTML = shopListHtml;
-
-    // Top 5 sản phẩm theo hoa hồng
-    const sortedProducts = Object.keys(productInfo).sort((a, b) => productInfo[b].commission - productInfo[a].commission);
-    const topList = document.getElementById("topProducts");
-    topList.innerHTML = "";
-
-    sortedProducts.slice(0, 5).forEach((pid) => {
-        const info = productInfo[pid];
-        let type = "MXH";
-        if (info.ref.includes("Shopeevideo")) type = "Video";
-        else if (info.ref.includes("Shopeelive")) type = "Live";
-        else if (info.ref) type = info.ref;
-
-        const formattedCommission = info.commission.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
-
-        const li = document.createElement("li");
-        li.innerHTML = `${truncateText(info.name, 50)} — <strong>${productCount[pid]} đơn, ${formattedCommission} (${type})</strong>`;
-        topList.appendChild(li);
-    });
-}
-
-// Hàm tính tổng hoa hồng và xử lý nhiều trang
-async function calculateAllPages() {
-    const enableLog = true; // Flag to enable/disable logging
-
-    // Function for conditional logging
-    function debugLog(message, data = null) {
-        if (enableLog) {
-            console.log(message, data);
-        }
-    }
-
-    try {
-        let allOrders = [];
-        let xtraCommission = 0;
-        let shopeeCommission = 0;
-
-        // Check start and end date inputs
-        const startDateInput = document.querySelector(".ant-calendar-range-picker-input:nth-child(1)");
-        const endDateInput = document.querySelector(".ant-calendar-range-picker-input:nth-child(3)");
-
-        // Extract values from input fields
-        const startDate = startDateInput ? startDateInput.value : "";
-        const endDate = endDateInput ? endDateInput.value : "";
-
-        let dateWarning = startDate !== endDate;
-        debugLog("Start and end date values:", { startDate, endDate, dateWarning });
-
-        // Function to select 100 entries per page
-        async function select100PerPage() {
-            const sizeChanger = document.querySelector(".ant-pagination-options-size-changer");
-            if (sizeChanger && sizeChanger.innerText.includes("20 / trang")) {
-                debugLog("Found page size changer, switching to 100 entries per page...");
-                sizeChanger.click();
-                await new Promise((r) => setTimeout(r, 500));
-                const dropdownItems = document.querySelectorAll(".ant-select-dropdown-menu-item");
-                for (const item of dropdownItems) {
-                    if (item.innerText.includes("100")) {
-                        item.click();
-                        await new Promise((r) => setTimeout(r, 2000)); // Wait for reload
-                        debugLog("Switched to 100 entries per page.");
-                        break;
-                    }
-                }
-            }
-        }
-
-        // Function to return to the first page
-        async function goToFirstPage() {
-            const prevButton = document.querySelector(".ant-pagination-prev");
-            if (prevButton && prevButton.classList.contains("ant-pagination-disabled") === false) {
-                const firstPageButton = document.querySelector(".ant-pagination-item-1");
-                if (firstPageButton && !firstPageButton.classList.contains("ant-pagination-item-active")) {
-                    debugLog("Returning to the first page...");
-                    firstPageButton.click();
-                    await new Promise((r) => setTimeout(r, 2000)); // Wait for page load
-                }
-            }
-        }
-
-        // Function to calculate Xtra and Shopee commission from DOM (like old code)
-        function calculateXtraAndShopeeCommission() {
-            // Tính hoa hồng Xtra
-            const xtraCommissionElements = document.querySelectorAll(".commission-wrap ul li");
-            xtraCommissionElements.forEach((element) => {
-                const xtraText = element.textContent;
-                if (xtraText && xtraText.includes("Hoa hồng Xtra")) {
-                    const parts = xtraText.split(":");
-                    if (parts.length > 1) {
-                        const commissionText = parts[1].trim();
-                        const commission = parseFloat(commissionText.replace(/[₫,.]/g, "").replace(/,/g, "."));
-                        if (!isNaN(commission)) {
-                            xtraCommission += commission;
-                            // debugLog("Found Xtra commission:", commission);
-                        }
-                    }
-                }
-            });
-
-            // Tính hoa hồng Shopee
-            const shopeeCommissionElements = document.querySelectorAll(".commission-wrap ul li");
-            shopeeCommissionElements.forEach((element) => {
-                const shopeeText = element.textContent;
-                if (shopeeText && shopeeText.includes("Hoa hồng từ Shopee")) {
-                    const parts = shopeeText.split(":");
-                    if (parts.length > 1) {
-                        const commissionText = parts[1].trim();
-                        const commission = parseFloat(commissionText.replace(/[₫,.]/g, "").replace(/,/g, "."));
-                        if (!isNaN(commission)) {
-                            shopeeCommission += commission;
-                            // debugLog("Found Shopee commission:", commission);
-                        }
-                    }
-                }
-            });
-        }
-
-        // Function to scrape data from the current page (theo logic code cũ)
-        function scrapeCurrentPage() {
-            // Calculate Xtra and Shopee commission from DOM first
-            calculateXtraAndShopeeCommission();
-
-            // Try multiple selector patterns to find order rows
-            let orderRows = document.querySelectorAll(".conversion-report-table tbody tr, .conversion-report-table tr");
-            if (orderRows.length === 0) {
-                orderRows = document.querySelectorAll(".ant-table-tbody tr");
-            }
-            if (orderRows.length === 0) {
-                // Try finding rows within the conversion-report-table div
-                const tableContainer = document.querySelector(".conversion-report-table");
-                if (tableContainer) {
-                    orderRows = tableContainer.querySelectorAll("tr");
-                }
-            }
-
-            debugLog(`Scraping data from ${orderRows.length} rows on the current page.`);
-
-            if (orderRows.length === 0) {
-                debugLog("Warning: No order rows found. Trying alternative selectors...");
-                // Last resort: try to find any table rows
-                orderRows = document.querySelectorAll("table tbody tr, table tr");
-                debugLog(`Found ${orderRows.length} rows with alternative selector.`);
-            }
-
-            // Logic xử lý: nhóm các row theo Order id để cộng GMV của tất cả sản phẩm trong cùng đơn hàng
-            const orderMap = new Map(); // Map để nhóm các sản phẩm theo Order id
-
-            orderRows.forEach((row) => {
-                const shopNameEl = row.querySelector(".shop-details-wrapper>ul>li>span>a");
-                const productNameEl = row.querySelector(".item-details-info-wrap .item-details-info-ceils>ul>li>span>a");
-
-                // Lấy Order id từ row (có thể ở row đầu với rowspan)
-                let orderId = null;
-                const orderIdEl = row.querySelector(".report-order-details-wrapper .report-table-value-text-medium");
-                if (orderIdEl) {
-                    orderId = orderIdEl.textContent.trim();
-                } else {
-                    // Nếu không có trong row này, tìm trong các row trước đó (rowspan)
-                    let prevRow = row.previousElementSibling;
-                    while (prevRow && !orderId) {
-                        const prevOrderIdEl = prevRow.querySelector(".report-order-details-wrapper .report-table-value-text-medium");
-                        if (prevOrderIdEl) {
-                            orderId = prevOrderIdEl.textContent.trim();
-                            break;
-                        }
-                        prevRow = prevRow.previousElementSibling;
-                    }
-                }
-
-                // Lấy hoa hồng từ commission-top-bold (tổng hoa hồng đơn hàng) - chỉ có ở row đầu
-                const commissionEl = row.querySelector("li.commission-top-bold>span");
-
-                const itemIdEl = row.querySelector(".item-details-info-ceils>ul>li:nth-child(2) span");
-
-                // Lấy GMV từ commission-wrap có commission-top nhưng KHÔNG có text "Hoa hồng"
-                // Phải kiểm tra kỹ vì một số class tên "commission" nhưng giá trị là GMV
-                let gmvEl = null;
-                const commissionWraps = row.querySelectorAll(".commission-wrap");
-                for (const wrap of commissionWraps) {
-                    const commissionTop = wrap.querySelector(".commission-top:not(.commission-top-bold)");
-                    if (commissionTop) {
-                        // Kiểm tra xem có chứa text "Hoa hồng" không
-                        const wrapText = wrap.textContent || "";
-                        if (!wrapText.includes("Hoa hồng")) {
-                            // Đây là GMV
-                            gmvEl = commissionTop.querySelector("span");
-                            break;
-                        }
-                    }
-                }
-
-                let itemId = "0";
-                if (itemIdEl) {
-                    const text = itemIdEl.textContent.trim();
-                    const match = text.match(/Item id:\s*(\d+)/);
-                    if (match && match[1]) {
-                        itemId = match[1];
-                    }
-                }
-
-                const liList = row.querySelectorAll("ul.report-table-ul-8 li");
-                let referrer = "MXH";
-                let isCanceled = false;
-
-                // Kiểm tra trạng thái đơn hàng
-                const statusElements = row.querySelectorAll("span.an-tag");
-                statusElements.forEach((statusEl) => {
-                    const statusText = statusEl.textContent.trim();
-                    if (statusText === "Đã hủy") {
-                        isCanceled = true;
-                    }
-                });
-
-                // Lấy kênh - có thể ở row đầu với rowspan
-                let foundReferrer = false;
-                for (const li of liList) {
-                    const labelEl = li.querySelector(".report-table-label-large");
-                    const valueEl = li.querySelector(".report-table-value-text-large");
-                    if (labelEl && valueEl && labelEl.textContent.includes("Kênh:")) {
-                        referrer = valueEl.textContent.trim();
-                        foundReferrer = true;
-                        break;
-                    }
-                }
-
-                // Nếu không tìm thấy referrer trong row này, tìm trong row trước (rowspan)
-                if (!foundReferrer) {
-                    let prevRow = row.previousElementSibling;
-                    while (prevRow) {
-                        const prevLiList = prevRow.querySelectorAll("ul.report-table-ul-8 li");
-                        for (const li of prevLiList) {
-                            const labelEl = li.querySelector(".report-table-label-large");
-                            const valueEl = li.querySelector(".report-table-value-text-large");
-                            if (labelEl && valueEl && labelEl.textContent.includes("Kênh:")) {
-                                referrer = valueEl.textContent.trim();
-                                foundReferrer = true;
-                                break;
-                            }
-                        }
-                        if (foundReferrer) break;
-                        prevRow = prevRow.previousElementSibling;
-                    }
-                }
-
-                // Lấy shop name - có thể ở row đầu với rowspan
-                let shopName = null;
-                if (shopNameEl) {
-                    shopName = shopNameEl.textContent.trim();
-                } else {
-                    // Tìm trong row trước (rowspan)
-                    let prevRow = row.previousElementSibling;
-                    while (prevRow) {
-                        const prevShopNameEl = prevRow.querySelector(".shop-details-wrapper>ul>li>span>a");
-                        if (prevShopNameEl) {
-                            shopName = prevShopNameEl.textContent.trim();
-                            break;
-                        }
-                        prevRow = prevRow.previousElementSibling;
-                    }
-                }
-
-                // Lấy GMV của sản phẩm này
-                let gmv = 0;
-                if (gmvEl) {
-                    const gmvText = gmvEl.textContent.trim();
-                    // Xử lý cả trường hợp có chữ "k" (nghìn)
-                    let processedGmvText = gmvText.replace(/[₫,.]/g, "").replace(/,/g, ".");
-                    // Xử lý trường hợp có chữ "k" (nghìn)
-                    if (processedGmvText.includes("k")) {
-                        processedGmvText = processedGmvText.replace("k", "");
-                        gmv = parseFloat(processedGmvText) * 1000;
-                    } else {
-                        gmv = parseFloat(processedGmvText);
-                    }
-                    if (!isNaN(gmv)) {
-                        debugLog(`GMV found for item ${itemId}: ${gmv}`);
-                    }
-                }
-
-                // Lấy hoa hồng tổng đơn hàng (chỉ có ở row đầu)
-                let totalCommission = 0;
-                if (commissionEl) {
-                    totalCommission = parseFloat(commissionEl.textContent.replace(/[₫,.]/g, "").replace(/,/g, "."));
-                } else {
-                    // Tìm trong row trước (rowspan)
-                    let prevRow = row.previousElementSibling;
-                    while (prevRow) {
-                        const prevCommissionEl = prevRow.querySelector("li.commission-top-bold>span");
-                        if (prevCommissionEl) {
-                            totalCommission = parseFloat(prevCommissionEl.textContent.replace(/[₫,.]/g, "").replace(/,/g, "."));
-                            break;
-                        }
-                        prevRow = prevRow.previousElementSibling;
-                    }
-                }
-
-                // Chỉ xử lý nếu có sản phẩm
-                if (productNameEl && shopName) {
-                    // Sử dụng Order id làm key, nếu không có thì dùng itemId
-                    const key = orderId || `item_${itemId}`;
-
-                    if (!orderMap.has(key)) {
-                        orderMap.set(key, {
-                            orderId: orderId,
-                            shopName: shopName,
-                            referrer: referrer,
-                            totalCommission: totalCommission,
-                            items: [],
-                            totalGMV: 0,
-                        });
-                    }
-
-                    const orderData = orderMap.get(key);
-
-                    // Thêm sản phẩm vào order
-                    orderData.items.push({
-                        shop_name: shopName,
-                        item_name: productNameEl.textContent.trim(),
-                        item_commission: totalCommission, // Sử dụng tổng hoa hồng đơn hàng
-                        item_id: itemId,
-                        referrer: referrer,
-                        item_gmv: gmv, // GMV của từng sản phẩm
-                    });
-
-                    // Cộng GMV vào tổng GMV của order
-                    orderData.totalGMV += gmv;
-
-                    debugLog(`Added item ${itemId} to order ${key}, gmv: ${gmv}, totalGMV: ${orderData.totalGMV}`);
-                }
-            });
-
-            // Chuyển đổi Map thành mảng orders
-            orderMap.forEach((orderData) => {
-                // Cập nhật GMV cho tất cả items trong order (sử dụng tổng GMV)
-                orderData.items.forEach((item) => {
-                    item.item_gmv = orderData.totalGMV;
-                });
-
-                allOrders.push({
-                    orders: [
-                        {
-                            items: orderData.items,
-                        },
-                    ],
-                });
-
-                debugLog(`Order ${orderData.orderId || "unknown"}: ${orderData.items.length} items, totalGMV: ${orderData.totalGMV}`);
-            });
-        }
-
-        // Function to process orders data (inline version for injected script) - theo logic code cũ
-        function processOrdersDataInline(orders, xtraComm, shopeeComm) {
-            let totalCommission = 0;
-            let totalGMV = 0;
-
-            let totalOrders = 0;
-            let canceledOrders = 0;
-            let unpaidOrders = 0;
-
-            let videoOrders = 0;
-            let liveOrders = 0;
-            let socialOrders = 0;
-
-            let zeroCommissionOrders = 0;
-
-            let videoCommission = 0;
-            let liveCommission = 0;
-            let socialCommission = 0;
-            let canceledCommission = 0;
-            let zeroCommission = 0;
-
-            // Xử lý từng order - như code cũ
-            orders.forEach((orderData) => {
-                // Hỗ trợ cả format từ DOM scraping và API
-                const ordersList = orderData.orders || (orderData.list ? orderData.list.flatMap((item) => item.orders || []) : []);
-
-                ordersList.forEach((order) => {
-                    const items = order.items || [];
-
-                    if (items.length === 0) return;
-
-                    // Lấy GMV và commission từ item đầu tiên (vì tất cả items trong cùng order đã có cùng giá trị = tổng của order)
-                    const firstItem = items[0];
-                    const orderGMV = parseFloat(firstItem.item_gmv || firstItem.actual_amount || firstItem.item_price || 0);
-                    const orderCommission = parseFloat(firstItem.item_commission || 0);
-                    const referrer = firstItem.referrer || orderData.referrer || "MXH";
-
-                    totalGMV += orderGMV; // Chỉ cộng một lần cho mỗi order
-                    totalCommission += orderCommission; // Chỉ cộng một lần cho mỗi order
-
-                    debugLog(`Order: ${items.length} items, GMV: ${orderGMV}, Commission: ${orderCommission}`);
-
-                    // Phân loại hoa hồng theo kênh
-                    if (referrer.includes("Shopeevideo") || referrer.includes("Shopeevideo-Shopee")) {
-                        videoCommission += orderCommission;
-                    } else if (referrer.includes("Shopeelive") || referrer.includes("Shopeelive-Shopee")) {
-                        liveCommission += orderCommission;
-                    } else {
-                        socialCommission += orderCommission;
-                    }
-
-                    // Kiểm tra hoa hồng 0đ
-                    if (orderCommission === 0) {
-                        zeroCommissionOrders++;
-                        zeroCommission += orderCommission;
-                    }
-
-                    // Kiểm tra trạng thái đơn hàng
-                    const orderStatus = order.order_status || orderData.checkout_status || "";
-                    if (orderStatus === "CANCELED" || orderStatus === "Canceled" || order.cancel_reason) {
-                        canceledCommission += orderCommission;
-                    }
-
-                    totalOrders++;
-                });
-            });
-
-            // Đếm orders theo kênh và trạng thái - như code cũ
-            orders.forEach((orderData) => {
-                const ordersList = orderData.orders || (orderData.list ? orderData.list.flatMap((item) => item.orders || []) : []);
-                ordersList.forEach((order) => {
-                    const items = order.items || [];
-                    if (items.length > 0) {
-                        const referrer = items[0].referrer || orderData.referrer || "MXH";
-                        const orderStatus = order.order_status || orderData.checkout_status || "";
-
-                        if (referrer.includes("Shopeevideo") || referrer.includes("Shopeevideo-Shopee")) {
-                            videoOrders++;
-                        } else if (referrer.includes("Shopeelive") || referrer.includes("Shopeelive-Shopee")) {
-                            liveOrders++;
-                        }
-
-                        if (orderStatus === "CANCELED" || orderStatus === "Canceled" || order.cancel_reason) {
-                            canceledOrders++;
-                        } else if (orderStatus === "UNPAID" || orderStatus === "Pending") {
-                            unpaidOrders++;
-                        }
-                    }
-                });
-            });
-
-            // Tính socialOrders như code cũ: totalOrders - videoOrders - liveOrders
-            socialOrders = totalOrders - videoOrders - liveOrders;
-
-            // Format kết quả - sử dụng xtraComm và shopeeComm từ DOM scraping - như code cũ
-            return {
-                totalCommission: totalCommission.toLocaleString("vi-VN", { style: "currency", currency: "VND" }),
-                totalGMV: totalGMV.toLocaleString("vi-VN", { style: "currency", currency: "VND" }),
-                videoCommission: videoCommission.toLocaleString("vi-VN", { style: "currency", currency: "VND" }),
-                liveCommission: liveCommission.toLocaleString("vi-VN", { style: "currency", currency: "VND" }),
-                socialCommission: socialCommission.toLocaleString("vi-VN", { style: "currency", currency: "VND" }),
-                canceledCommission: canceledCommission.toLocaleString("vi-VN", { style: "currency", currency: "VND" }),
-                zeroCommission: zeroCommission.toLocaleString("vi-VN", { style: "currency", currency: "VND" }),
-                xtraCommission: (xtraComm / 2).toLocaleString("vi-VN", { style: "currency", currency: "VND" }),
-                shopeeCommission: (shopeeComm / 2).toLocaleString("vi-VN", { style: "currency", currency: "VND" }),
-                totalOrders: `${totalOrders - canceledOrders / 2 - unpaidOrders / 2} (${totalOrders} - <span class="badge bg-secondary">${unpaidOrders / 2}</span> - <span class="badge bg-danger">${canceledOrders / 2}</span>)`,
-                canceledOrders: canceledOrders / 2,
-                unpaidOrders: unpaidOrders / 2,
-                videoOrders: videoOrders, // KHÔNG chia cho 2
-                liveOrders: liveOrders, // KHÔNG chia cho 2
-                socialOrders: socialOrders, // KHÔNG chia cho 2 - tính từ totalOrders
-                zeroCommissionOrders: zeroCommissionOrders, // KHÔNG chia cho 2
-            };
-        }
-
-        // Function to move to the next page and process
-        async function processNextPage() {
-            try {
-                const nextPageButton = document.querySelector(".ant-pagination-next");
-
-                if (nextPageButton && !nextPageButton.classList.contains("ant-pagination-disabled")) {
-                    nextPageButton.click();
-                    debugLog("Moving to the next page...");
-                    await new Promise((resolve) => setTimeout(resolve, 3000));
-                    scrapeCurrentPage(); // Scrape data for the current page
-                    return await processNextPage(); // Recursive call for subsequent pages - ensure await
-                } else {
-                    debugLog("Reached the last page. Total orders scraped: " + allOrders.length);
-                    debugLog("Total Xtra commission scraped: " + xtraCommission);
-                    debugLog("Total Shopee commission scraped: " + shopeeCommission);
-                    const calculatedResults = processOrdersDataInline(allOrders, xtraCommission, shopeeCommission);
-                    debugLog("Calculated results:", calculatedResults);
-                    return {
-                        ...calculatedResults,
-                        startDate: startDate,
-                        endDate: endDate,
-                        dateWarning: dateWarning,
-                        allOrders: allOrders,
-                    };
-                }
-            } catch (error) {
-                debugLog("Error in processNextPage:", error);
-                // Return a valid result even if there's an error
-                const calculatedResults = processOrdersDataInline(allOrders, xtraCommission, shopeeCommission);
-                return {
-                    ...calculatedResults,
-                    startDate: startDate,
-                    endDate: endDate,
-                    dateWarning: dateWarning,
-                    allOrders: allOrders,
-                    error: true,
-                    message: error.message || "Error processing pages",
-                };
-            }
-        }
-
-        await select100PerPage(); // Set 100 entries per page
-        await goToFirstPage(); // Return to the first page
-        scrapeCurrentPage(); // Scrape data for the first page
-        debugLog("After first page scrape, allOrders length: " + allOrders.length);
-
-        const result = await processNextPage(); // Process subsequent pages
-        debugLog("Final result:", result);
-
-        // Ensure we always return a valid object
-        if (!result || typeof result !== "object") {
-            debugLog("Warning: processNextPage returned invalid result, creating default");
-            const calculatedResults = processOrdersDataInline(allOrders, xtraCommission, shopeeCommission);
-            return {
-                ...calculatedResults,
-                startDate: startDate,
-                endDate: endDate,
-                dateWarning: dateWarning,
-                allOrders: allOrders,
-            };
-        }
-
-        return result;
-    } catch (error) {
-        console.error("Error in calculateAllPages:", error);
-        return {
-            error: true,
-            message: error.message || "An error occurred during calculation",
-            totalCommission: "0 ₫",
-            xtraCommission: "0 ₫",
-            shopeeCommission: "0 ₫",
-            totalGMV: "0 ₫",
-            totalOrders: "0",
-            canceledOrders: 0,
-            unpaidOrders: 0,
-            videoOrders: 0,
-            liveOrders: 0,
-            socialOrders: 0,
-            zeroCommissionOrders: 0,
-            videoCommission: "0 ₫",
-            liveCommission: "0 ₫",
-            socialCommission: "0 ₫",
-            canceledCommission: "0 ₫",
-            zeroCommission: "0 ₫",
-            startDate: "",
-            endDate: "",
-            dateWarning: false,
-            allOrders: [],
-        };
-    }
-}
+    `;document.body.innerHTML+=B}}),($=document.getElementById("captureBtn"))==null||$.addEventListener("click",async function(){try{let o=document.getElementById("captureBtn");o.style.visibility="hidden";let i=document.getElementById("top-shop-product");i.style.display="none";let f=document.getElementById("CommissionWarning");f&&(f.style.display="none"),await new Promise(y=>setTimeout(y,200)),(await html2canvas(document.documentElement,{backgroundColor:"#ffffff",scale:2,logging:!1,useCORS:!0})).toBlob(async function(y){try{let O=new ClipboardItem({"image/png":y});await navigator.clipboard.write([O]);let g=document.createElement("div");g.className="toast-notification",g.textContent="\u0110\xE3 copy \u1EA3nh v\xE0o b\u1ED9 nh\u1EDB \u0111\u1EC7m!",document.body.appendChild(g),setTimeout(()=>{document.body.removeChild(g)},2e3)}catch(O){console.error("Error copying to clipboard:",O),alert("Kh\xF4ng th\u1EC3 copy \u1EA3nh v\xE0o b\u1ED9 nh\u1EDB \u0111\u1EC7m. Vui l\xF2ng th\u1EED l\u1EA1i.")}o.style.visibility="visible",i.style.display="block",f.style.display="block"},"image/png")}catch(o){console.error("Error capturing screenshot:",o),alert("C\xF3 l\u1ED7i khi ch\u1EE5p \u1EA3nh. Vui l\xF2ng th\u1EED l\u1EA1i."),document.getElementById("captureBtn").style.visibility="visible"}})});function j(){window.scrollTo(0,document.body.scrollHeight)}function J($,o){return $?$.length>o?$.slice(0,o)+"...":$:""}function Q($){let o={},i={},f={},s={};$.forEach(p=>{p.orders.forEach(a=>{let b=a.items[0].shop_name||"Kh\xF4ng r\xF5 shop";o[b]=(o[b]||0)+1,i[b]=(i[b]||0)+parseInt(a.items[0].item_commission||0),a.items.forEach(h=>{console.log("item_id:",h.item_id,"name:",h.item_name,"commission:",h.item_commission,"ref:",h.referrer);let x=`${h.item_id}`;f[x]=(f[x]||0)+1,s[x]?s[x].commission+=parseInt(h.item_commission||0):s[x]={name:h.item_name||"S\u1EA3n ph\u1EA9m kh\xF4ng r\xF5",ref:h.referrer||"Kh\xF4ng r\xF5",commission:parseInt(h.item_commission||0)}})})});let g=Object.keys(o).sort((p,a)=>o[a]-o[p]).slice(0,3).map(p=>{let a=o[p],b=i[p];return`${p} \u2014 <strong>${a} \u0111\u01A1n, ${b.toLocaleString("vi-VN",{style:"currency",currency:"VND"})}</strong>`}).join("<br>");document.getElementById("topShop").innerHTML=g;let L=Object.keys(s).sort((p,a)=>s[a].commission-s[p].commission),B=document.getElementById("topProducts");B.innerHTML="",L.slice(0,5).forEach(p=>{let a=s[p],b="MXH";a.ref.includes("Shopeevideo")?b="Video":a.ref.includes("Shopeelive")?b="Live":a.ref&&(b=a.ref);let h=a.commission.toLocaleString("vi-VN",{style:"currency",currency:"VND"}),x=document.createElement("li");x.innerHTML=`${J(a.name,50)} \u2014 <strong>${f[p]} \u0111\u01A1n, ${h} (${b})</strong>`,B.appendChild(x)})}async function Y(){function o(i,f=null){console.log(i,f)}try{let b=function(){document.querySelectorAll(".commission-wrap ul li").forEach(n=>{let m=n.textContent;if(m&&m.includes("Hoa h\u1ED3ng Xtra")){let v=m.split(":");if(v.length>1){let d=v[1].trim(),C=parseFloat(d.replace(/[₫,.]/g,"").replace(/,/g,"."));isNaN(C)||(f+=C)}}}),document.querySelectorAll(".commission-wrap ul li").forEach(n=>{let m=n.textContent;if(m&&m.includes("Hoa h\u1ED3ng t\u1EEB Shopee")){let v=m.split(":");if(v.length>1){let d=v[1].trim(),C=parseFloat(d.replace(/[₫,.]/g,"").replace(/,/g,"."));isNaN(C)||(s+=C)}}})},h=function(){b();let r=document.querySelectorAll(".conversion-report-table tbody tr, .conversion-report-table tr");if(r.length===0&&(r=document.querySelectorAll(".ant-table-tbody tr")),r.length===0){let n=document.querySelector(".conversion-report-table");n&&(r=n.querySelectorAll("tr"))}o(`Scraping data from ${r.length} rows on the current page.`),r.length===0&&(o("Warning: No order rows found. Trying alternative selectors..."),r=document.querySelectorAll("table tbody tr, table tr"),o(`Found ${r.length} rows with alternative selector.`));let c=new Map;r.forEach(n=>{let m=n.querySelector(".shop-details-wrapper>ul>li>span>a"),v=n.querySelector(".item-details-info-wrap .item-details-info-ceils>ul>li>span>a"),d=null,C=n.querySelector(".report-order-details-wrapper .report-table-value-text-medium");if(C)d=C.textContent.trim();else{let e=n.previousElementSibling;for(;e&&!d;){let t=e.querySelector(".report-order-details-wrapper .report-table-value-text-medium");if(t){d=t.textContent.trim();break}e=e.previousElementSibling}}let N=n.querySelector("li.commission-top-bold>span"),I=n.querySelector(".item-details-info-ceils>ul>li:nth-child(2) span"),V=null,D=n.querySelectorAll(".commission-wrap");for(let e of D){let t=e.querySelector(".commission-top:not(.commission-top-bold)");if(t&&!(e.textContent||"").includes("Hoa h\u1ED3ng")){V=t.querySelector("span");break}}let S="0";if(I){let t=I.textContent.trim().match(/Item id:\s*(\d+)/);t&&t[1]&&(S=t[1])}let T=n.querySelectorAll("ul.report-table-ul-8 li"),_="MXH",w=!1;if(d){let e=n.querySelectorAll("span.an-tag");for(let t of e)if(t.textContent.trim()==="\u0110\xE3 h\u1EE7y"){w=!0;break}}else{let e=n.previousElementSibling;for(;e;){let t=e.querySelector(".report-order-details-wrapper .report-table-value-text-medium");if(t?t.textContent.trim():null){let k=e.querySelectorAll("span.an-tag");for(let H of k)if(H.textContent.trim()==="\u0110\xE3 h\u1EE7y"){w=!0;break}break}e=e.previousElementSibling}}let E=!1;for(let e of T){let t=e.querySelector(".report-table-label-large"),l=e.querySelector(".report-table-value-text-large");if(t&&l&&t.textContent.includes("K\xEAnh:")){_=l.textContent.trim(),E=!0;break}}if(!E){let e=n.previousElementSibling;for(;e;){let t=e.querySelectorAll("ul.report-table-ul-8 li");for(let l of t){let k=l.querySelector(".report-table-label-large"),H=l.querySelector(".report-table-value-text-large");if(k&&H&&k.textContent.includes("K\xEAnh:")){_=H.textContent.trim(),E=!0;break}}if(E)break;e=e.previousElementSibling}}let A=null;if(m)A=m.textContent.trim();else{let e=n.previousElementSibling;for(;e;){let t=e.querySelector(".shop-details-wrapper>ul>li>span>a");if(t){A=t.textContent.trim();break}e=e.previousElementSibling}}let u=0;if(V){let t=V.textContent.trim().replace(/[₫,.]/g,"").replace(/,/g,".");t.includes("k")?(t=t.replace("k",""),u=parseFloat(t)*1e3):u=parseFloat(t),isNaN(u)||o(`GMV found for item ${S}: ${u}`)}let W=0;if(N)W=parseFloat(N.textContent.replace(/[₫,.]/g,"").replace(/,/g,"."));else{let e=n.previousElementSibling;for(;e;){let t=e.querySelector("li.commission-top-bold>span");if(t){W=parseFloat(t.textContent.replace(/[₫,.]/g,"").replace(/,/g,"."));break}e=e.previousElementSibling}}if(v&&A){let e=d||`item_${S}`;c.has(e)||c.set(e,{orderId:d,shopName:A,referrer:_,totalCommission:W,items:[],totalGMV:0,isCanceled:!1});let t=c.get(e),l=n.querySelector(".report-order-details-wrapper .report-table-value-text-medium")!==null;w&&l&&!t.isCanceled&&(t.isCanceled=!0,o(`Order ${e} (${d||"no-id"}) marked as CANCELED from first row`)),t.items.push({shop_name:A,item_name:v.textContent.trim(),item_commission:W,item_id:S,referrer:_,item_gmv:u}),t.totalGMV+=u,o(`Added item ${S} to order ${e} (${d||"no-id"}), gmv: ${u}, totalGMV: ${t.totalGMV}, isCanceled: ${w}`)}}),c.forEach(n=>{n.items.forEach(v=>{v.item_gmv=n.totalGMV});let m=n.isCanceled?"CANCELED":"";n.isCanceled&&o(`Pushing CANCELED order: ${n.orderId||"unknown"}, items: ${n.items.length}`),i.push({orders:[{items:n.items,order_status:m}]}),o(`Order ${n.orderId||"unknown"}: ${n.items.length} items, totalGMV: ${n.totalGMV}, isCanceled: ${n.isCanceled}, order_status: ${m}`)})},x=function(r,c,n){let m=0,v=0,d=0,C=0,N=0,I=0,V=0,D=0,S=0,T=0,_=0,w=0,E=0,A=0;return r.forEach(u=>{(u.orders||(u.list?u.list.flatMap(e=>e.orders||[]):[])).forEach(e=>{let t=e.items||[];if(t.length===0)return;let l=t[0],k=parseFloat(l.item_gmv||l.actual_amount||l.item_price||0),H=t.every(M=>parseFloat(M.item_gmv||M.actual_amount||M.item_price||0)===k),G=0,q=0;H&&l.item_gmv?(G=k,q=parseFloat(l.item_commission||0)):t.forEach(M=>{let K=parseFloat(M.item_gmv||M.actual_amount||M.item_price||0);G+=K;let X=parseFloat(M.item_commission||0),U=parseFloat(M.capped_brand_commission||0);q+=X+U});let R=l.referrer||u.referrer||"MXH";v+=G,m+=q,o(`Order: ${t.length} items, GMV: ${G}, Commission: ${q}`),R.includes("Shopeevideo")||R.includes("Shopeevideo-Shopee")?T+=q:R.includes("Shopeelive")||R.includes("Shopeelive-Shopee")?_+=q:w+=q,q===0&&(S++,A+=q);let z=e.order_status||u.checkout_status||"";(z==="CANCELED"||z==="Canceled"||e.cancel_reason)&&(E+=q),d++})}),r.forEach(u=>{(u.orders||(u.list?u.list.flatMap(e=>e.orders||[]):[])).forEach(e=>{let t=e.items||[];if(t.length>0){let l=t[0].referrer||u.referrer||"MXH",k=e.order_status||u.checkout_status||"";l.includes("Shopeevideo")||l.includes("Shopeevideo-Shopee")?I++:(l.includes("Shopeelive")||l.includes("Shopeelive-Shopee"))&&V++,k==="CANCELED"||k==="Canceled"||e.cancel_reason?(C++,o(`Found CANCELED order: orderId=${t[0].item_id||"unknown"}, items=${t.length}, status=${k}`)):(k==="UNPAID"||k==="Pending")&&N++}})}),o(`Total canceled orders counted: ${C}`),D=d-I-V,{totalCommission:m.toLocaleString("vi-VN",{style:"currency",currency:"VND"}),totalGMV:v.toLocaleString("vi-VN",{style:"currency",currency:"VND"}),videoCommission:T.toLocaleString("vi-VN",{style:"currency",currency:"VND"}),liveCommission:_.toLocaleString("vi-VN",{style:"currency",currency:"VND"}),socialCommission:w.toLocaleString("vi-VN",{style:"currency",currency:"VND"}),canceledCommission:E.toLocaleString("vi-VN",{style:"currency",currency:"VND"}),zeroCommission:A.toLocaleString("vi-VN",{style:"currency",currency:"VND"}),xtraCommission:(c/2).toLocaleString("vi-VN",{style:"currency",currency:"VND"}),shopeeCommission:(n/2).toLocaleString("vi-VN",{style:"currency",currency:"VND"}),totalOrders:`${d-C-N} (${d} - <span class="badge bg-secondary">${N}</span> - <span class="badge bg-danger">${C}</span>)`,canceledOrders:C,unpaidOrders:N,videoOrders:I,liveOrders:V,socialOrders:D,zeroCommissionOrders:S}},i=[],f=0,s=0,y=document.querySelector(".ant-calendar-range-picker-input:nth-child(1)"),O=document.querySelector(".ant-calendar-range-picker-input:nth-child(3)"),g=y?y.value:"",L=O?O.value:"",B=g!==L;o("Start and end date values:",{startDate:g,endDate:L,dateWarning:B});async function p(){let r=document.querySelector(".ant-pagination-options-size-changer");if(r&&r.innerText.includes("20 / trang")){o("Found page size changer, switching to 100 entries per page..."),r.click(),await new Promise(n=>setTimeout(n,500));let c=document.querySelectorAll(".ant-select-dropdown-menu-item");for(let n of c)if(n.innerText.includes("100")){n.click(),await new Promise(m=>setTimeout(m,2e3)),o("Switched to 100 entries per page.");break}}}async function a(){let r=document.querySelector(".ant-pagination-prev");if(r&&r.classList.contains("ant-pagination-disabled")===!1){let c=document.querySelector(".ant-pagination-item-1");c&&!c.classList.contains("ant-pagination-item-active")&&(o("Returning to the first page..."),c.click(),await new Promise(n=>setTimeout(n,2e3)))}}async function F(){try{let r=document.querySelector(".ant-pagination-next");if(r&&!r.classList.contains("ant-pagination-disabled"))return r.click(),o("Moving to the next page..."),await new Promise(c=>setTimeout(c,3e3)),h(),await F();{o("Reached the last page. Total orders scraped: "+i.length),o("Total Xtra commission scraped: "+f),o("Total Shopee commission scraped: "+s);let c=x(i,f,s);return o("Calculated results:",c),{...c,startDate:g,endDate:L,dateWarning:B,allOrders:i}}}catch(r){return o("Error in processNextPage:",r),{...x(i,f,s),startDate:g,endDate:L,dateWarning:B,allOrders:i,error:!0,message:r.message||"Error processing pages"}}}await p(),await a(),h(),o("After first page scrape, allOrders length: "+i.length);let P=await F();return o("Final result:",P),!P||typeof P!="object"?(o("Warning: processNextPage returned invalid result, creating default"),{...x(i,f,s),startDate:g,endDate:L,dateWarning:B,allOrders:i}):P}catch(i){return console.error("Error in calculateAllPages:",i),{error:!0,message:i.message||"An error occurred during calculation",totalCommission:"0 \u20AB",xtraCommission:"0 \u20AB",shopeeCommission:"0 \u20AB",totalGMV:"0 \u20AB",totalOrders:"0",canceledOrders:0,unpaidOrders:0,videoOrders:0,liveOrders:0,socialOrders:0,zeroCommissionOrders:0,videoCommission:"0 \u20AB",liveCommission:"0 \u20AB",socialCommission:"0 \u20AB",canceledCommission:"0 \u20AB",zeroCommission:"0 \u20AB",startDate:"",endDate:"",dateWarning:!1,allOrders:[]}}}})();

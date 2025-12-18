@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tổng quan Click - Shopee Commission Calculator</title>
+        <link href="/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+        <style>
+            body {
+                background-color: #fffaf5;
+                color: #333;
+                font-family: "Segoe UI", sans-serif;
+            }
+
+            a {
+                text-decoration: none;
+            }
+
+            .filter-section {
+                background-color: white;
+                border-radius: 8px;
+                padding: 0.5rem;
+                margin-bottom: 0.5rem;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .stats-card {
+                background-color: white;
+                border-radius: 8px;
+                padding: 0.5rem;
+                margin-bottom: 0.5rem;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .table-responsive {
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .loading {
+                text-align: center;
+                padding: 1rem;
+            }
+
+            .quick-date-btn.active {
+                background-color: #0d6efd;
+                color: white;
+                border-color: #0d6efd;
+            }
+
+            .quick-date-btn.active:hover {
+                background-color: #0b5ed7;
+                border-color: #0a58ca;
+            }
+
+            .rating-profit {
+                color: #28a745;
+                font-weight: bold;
+            }
+
+            .rating-loss {
+                color: #dc3545;
+                font-weight: bold;
+            }
+
+            .rating-ineffective {
+                color: #ffc107;
+                font-weight: bold;
+            }
+
+            .rating-potential {
+                color: #17a2b8;
+                font-weight: bold;
+            }
+
+            .summary-stats-card {
+                background-color: white;
+                border-radius: 8px;
+                padding: 0.5rem;
+                margin-bottom: 0.5rem;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .summary-box {
+                background-color: white;
+                border-radius: 8px;
+                padding: 0.5rem;
+                text-align: center;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                border: 2px solid #e0e0e0;
+                margin-bottom: 0.5rem;
+                transition: transform 0.2s;
+            }
+
+            .summary-box:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .summary-box.total-clicks {
+                border-color: #2196f3;
+                background-color: #e3f2fd;
+                color: #0d47a1;
+            }
+
+            .summary-box.total-orders {
+                border-color: #4caf50;
+                background-color: #e8f5e9;
+                color: #1b5e20;
+            }
+
+            .summary-box.total-commission {
+                border-color: #ff9800;
+                background-color: #fff3e0;
+                color: #e65100;
+            }
+
+            .summary-box.avg-epc {
+                border-color: #9c27b0;
+                background-color: #f3e5f5;
+                color: #4a148c;
+            }
+
+            .summary-box.avg-cvr {
+                border-color: #00bcd4;
+                background-color: #e0f7fa;
+                color: #006064;
+            }
+
+            .summary-box.total-profit {
+                border-color: #f44336;
+                background-color: #ffebee;
+                color: #b71c1c;
+            }
+
+            .summary-box.unique-subids {
+                border-color: #607d8b;
+                background-color: #eceff1;
+                color: #263238;
+            }
+
+            .summary-box small {
+                display: block;
+                font-size: 0.8rem;
+                margin-bottom: 5px;
+                font-weight: 500;
+            }
+
+            .summary-box .summary-value {
+                font-size: 1.2rem;
+                font-weight: bold;
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container mt-4">
+            <h2 class="h4 text-center mb-3">Tổng quan Click</h2>
+            <div id="common-header"></div>
+
+            <div id="loadingMessage" class="loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <p class="mt-2">Đang tải dữ liệu...</p>
+            </div>
+
+            <div id="noDataMessage" class="alert alert-warning" style="display: none">
+                <strong>Chưa có dữ liệu!</strong>
+                <p class="mb-1">Vui lòng đồng bộ dữ liệu click từ trang cài đặt trước.</p>
+                <p class="mb-0 small">Mở <strong>Cài đặt</strong> → <strong>Đồng bộ Click</strong> → Nhấn <strong>Đồng bộ Click ngay</strong></p>
+                <p class="mt-2 mb-0">
+                    <button class="btn btn-sm btn-primary" id="openOptionsBtn">Mở trang cài đặt</button>
+                </p>
+            </div>
+
+            <div id="noFilterResultsMessage" class="alert alert-info p-2" style="display: none">
+                <strong>Không có kết quả!</strong>
+                <p class="mb-0">Không tìm thấy dữ liệu nào phù hợp với bộ lọc bạn đã chọn. Vui lòng thử lại với tiêu chí khác.</p>
+            </div>
+
+            <div id="mainContent" style="display: none">
+                <!-- Phần bộ lọc -->
+                <div class="filter-section">
+                    <form id="filterForm">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="start_date">Thời gian bắt đầu:</label>
+                                    <input type="date" class="form-control form-control-sm" id="start_date" name="start_date" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="start_time">Giờ bắt đầu:</label>
+                                    <input type="time" class="form-control form-control-sm" id="start_time" name="start_time" value="00:00" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="end_date">Thời gian kết thúc:</label>
+                                    <input type="date" class="form-control form-control-sm" id="end_date" name="end_date" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="end_time">Giờ kết thúc:</label>
+                                    <input type="time" class="form-control form-control-sm" id="end_time" name="end_time" value="23:59" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12 mb-2">
+                                <div class="form-group">
+                                    <label class="small">Chọn:</label>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-outline-primary quick-date-btn" data-days="1">Hôm qua</button>
+                                        <button type="button" class="btn btn-outline-primary quick-date-btn" data-days="7">7 ngày qua</button>
+                                        <button type="button" class="btn btn-outline-primary quick-date-btn" data-days="30">30 ngày qua</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <div class="form-group small">
+                                    <label for="sub_id">Lọc theo Sub ID:</label>
+                                    <input type="text" class="form-control form-control-sm" id="sub_id" name="sub_id" placeholder="Nhập Sub ID" />
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-warning btn-sm btn-block w-100 px-3 py-1 mt-2">👉Lọc dữ liệu</button>
+                    </form>
+                </div>
+
+                <!-- Bảng tổng quan -->
+                <div class="summary-stats-card" id="summaryStatsCard" style="display: none">
+                    <h6 class="mb-3">📊 Thống kê</h6>
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <div class="summary-box total-clicks">
+                                <small>Tổng Click</small>
+                                <p class="summary-value mb-0" id="summaryTotalClicks">0</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <div class="summary-box total-orders">
+                                <small>Tổng đơn hàng</small>
+                                <p class="summary-value mb-0" id="summaryTotalOrders">0</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <div class="summary-box total-commission">
+                                <small>Tổng hoa hồng</small>
+                                <p class="summary-value mb-0" id="summaryTotalCommission">0 ₫</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <div class="summary-box avg-epc">
+                                <small>EPC trung bình</small>
+                                <p class="summary-value mb-0" id="summaryAvgEPC">0 ₫</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <div class="summary-box avg-cvr">
+                                <small>CVR trung bình</small>
+                                <p class="summary-value mb-0" id="summaryAvgCVR">0%</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <div class="summary-box total-profit">
+                                <small>Tổng lợi nhuận</small>
+                                <p class="summary-value mb-0" id="summaryTotalProfit">0 ₫</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <div class="summary-box unique-subids">
+                                <small>Số Sub ID duy nhất</small>
+                                <p class="summary-value mb-0" id="summaryUniqueSubIds">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phân tích Click -->
+                <div class="stats-card" id="clickAnalysisSection" style="display: none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">📈 Phân tích Click</h6>
+                        <button class="btn btn-sm btn-outline-primary" id="configCPCBtn">⚙️ Cấu hình CPC</button>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="text-center p-1 bg-light rounded" style="padding: 0.33rem !important">
+                                <div class="h2 mb-1" id="analysisTotalClicks">0</div>
+                                <small class="text-muted">Tổng Click</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-1 bg-light rounded">
+                                <div class="h6 mb-1" id="topPlatform">-</div>
+                                <div class="text-muted small" id="topPlatformClicks">0 clicks</div>
+                                <small class="text-muted small">Top Platform</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-1 bg-light rounded">
+                                <div class="h6 mb-1" id="topRegion">-</div>
+                                <div class="text-muted small" id="topRegionClicks">0 clicks</div>
+                                <small class="text-muted small">Top Region</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="mb-2">Phân bổ theo Platform</h6>
+                            <div style="position: relative; height: 300px">
+                                <canvas id="platformDistributionChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="mb-2">Click theo Khu vực</h6>
+                            <div style="position: relative; height: 300px">
+                                <canvas id="regionClicksChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <h6 class="mb-2">Top SubID theo Click</h6>
+                        <div class="table-responsive" style="max-height: 400px">
+                            <table id="topSubIdTable" class="table table-sm table-bordered table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>SubID</th>
+                                        <th>Clicks</th>
+                                        <th>% Tổng</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="topSubIdTableBody">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kết quả -->
+                <div class="result mt-4" style="min-width: 600px; position: relative" id="result-capture">
+                    <h5 class="text-center mb-2">Tổng quan Click theo Sub ID</h5>
+
+                    <p class="text-center">Ngày: <span id="startDate"></span> <span id="endDate"></span></p>
+
+                    <!-- Bảng tổng hợp -->
+                    <div class="stats-card">
+                        <h6 class="mb-3">Bảng tổng hợp theo Sub ID</h6>
+                        <div class="table-responsive small" style="max-height: 90vh">
+                            <table id="subIdStatsTable" class="table table-bordered table-hover" style="width: 100%">
+                                <thead class="thead-light" style="font-size: 12px; white-space: nowrap">
+                                    <tr>
+                                        <th>Loại</th>
+                                        <th>Sub ID1</th>
+                                        <th>Sub ID2</th>
+                                        <th>Sub ID3</th>
+                                        <th>Sub ID4</th>
+                                        <th>Sub ID5</th>
+                                        <th>Click</th>
+                                        <th>Đơn hàng</th>
+                                        <th>Hoa hồng (₫)</th>
+                                        <th>EPC (₫)</th>
+                                        <th>CVR (%)</th>
+                                        <th>CPC (₫)</th>
+                                        <th>Profit (₫)</th>
+                                        <th style="min-width: 80px">Đánh giá</th>
+                                        <th>Chi tiết</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hướng dẫn sử dụng -->
+            <div id="docs" class="stats-card mt-5" style="scroll-margin-top: 20px">
+                <h5 class="mb-2">📖 Hướng dẫn sử dụng</h5>
+
+                <div class="mb-2">
+                    <h5 class="text-primary">1. Giới thiệu</h5>
+                    <p>
+                        Trang <strong>Tổng quan Click</strong> giúp bạn phân tích và theo dõi hiệu quả của các link affiliate Shopee thông qua các chỉ số quan trọng như Click, Đơn hàng, Hoa hồng, EPC,
+                        CVR và Lợi nhuận.
+                    </p>
+                </div>
+
+                <div class="mb-2">
+                    <h6 class="text-primary">2. Cách sử dụng bộ lọc</h6>
+                    <ul>
+                        <li>
+                            <strong>Lọc theo thời gian:</strong>
+                            <ul>
+                                <li>Chọn <strong>Thời gian bắt đầu</strong> và <strong>Thời gian kết thúc</strong> để xem dữ liệu trong khoảng thời gian cụ thể</li>
+                                <li>Hoặc sử dụng các nút nhanh: <strong>Hôm qua</strong>, <strong>7 ngày qua</strong>, <strong>30 ngày qua</strong></li>
+                                <li>Có thể kết hợp với <strong>Giờ bắt đầu</strong> và <strong>Giờ kết thúc</strong> để lọc chính xác hơn</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Lọc theo Sub ID:</strong>
+                            <ul>
+                                <li>Nhập Sub ID vào ô <strong>Lọc theo Sub ID</strong> để xem dữ liệu của một Sub ID cụ thể</li>
+                                <li>Bạn có thể nhập một phần của Sub ID để tìm kiếm (ví dụ: "fb_page" sẽ tìm tất cả Sub ID chứa "fb_page")</li>
+                            </ul>
+                        </li>
+                        <li>Sau khi chọn các tiêu chí, nhấn nút <strong>👉Lọc dữ liệu</strong> để áp dụng bộ lọc</li>
+                    </ul>
+                </div>
+
+                <div class="mb-3">
+                    <h6 class="text-primary">3. Giải thích các chỉ số</h6>
+                    <ul>
+                        <li><strong>Click:</strong> Tổng số lượt click vào link affiliate của bạn</li>
+                        <li><strong>Đơn hàng:</strong> Số lượng đơn hàng được tạo từ các click đó</li>
+                        <li><strong>Hoa hồng (₫):</strong> Tổng số tiền hoa hồng bạn nhận được từ các đơn hàng</li>
+                        <li>
+                            <strong>EPC (Earnings Per Click):</strong> Hoa hồng trung bình trên mỗi click
+                            <ul>
+                                <li>Công thức: EPC = Tổng hoa hồng / Tổng click</li>
+                                <li>Chỉ số này cho biết mỗi click mang lại bao nhiêu tiền hoa hồng trung bình</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>CVR (Conversion Rate):</strong> Tỷ lệ chuyển đổi từ click sang đơn hàng
+                            <ul>
+                                <li>Công thức: CVR = (Số đơn hàng / Số click) × 100%</li>
+                                <li>Chỉ số này cho biết bao nhiêu % click được chuyển thành đơn hàng</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Profit (Lợi nhuận):</strong> Lợi nhuận thực tế sau khi trừ chi phí quảng cáo (CPC)
+                            <ul>
+                                <li>Công thức: Profit = Tổng hoa hồng - (Tổng click × CPC)</li>
+                                <li>Nếu bạn không quảng cáo (CPC = 0), Profit sẽ bằng Tổng hoa hồng</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mb-2">
+                    <h6 class="text-primary">4. Cấu hình CPC (Cost Per Click)</h6>
+                    <ul>
+                        <li>Nhấn nút <strong>⚙️ Cấu hình CPC</strong> trong phần <strong>Phân tích Click</strong></li>
+                        <li><strong>CPC trung bình:</strong> Chi phí mặc định cho mỗi click (VND). Đặt 0 nếu bạn chỉ rải link không quảng cáo</li>
+                        <li>
+                            <strong>CPC theo SubID:</strong> Cấu hình CPC riêng cho từng Sub ID cụ thể
+                            <ul>
+                                <li>Nhập tên Sub ID (ví dụ: "fb_page-page1----")</li>
+                                <li>Nhập CPC tương ứng (VND)</li>
+                                <li>Nhấn <strong>Thêm</strong> để lưu cấu hình</li>
+                            </ul>
+                        </li>
+                        <li>CPC được sử dụng để tính toán <strong>Profit</strong> (Lợi nhuận) = Hoa hồng - (Click × CPC)</li>
+                    </ul>
+                </div>
+
+                <div class="mb-2">
+                    <h6 class="text-primary">5. Đánh giá hiệu quả</h6>
+                    <p>Hệ thống tự động đánh giá hiệu quả của mỗi Sub ID dựa trên Profit:</p>
+                    <ul>
+                        <li><span class="rating-profit">🟢 Có lợi nhuận:</span> Profit > 0 (màu xanh lá)</li>
+                        <li><span class="rating-loss">🔴 Lỗ:</span> Profit < 0 (màu đỏ)</li>
+                        <li><span class="rating-ineffective">🟡 Không hiệu quả:</span> Profit = 0 hoặc có click nhưng không có đơn hàng (màu vàng)</li>
+                        <li><span class="rating-potential">🔵 Tiềm năng:</span> Có đơn hàng nhưng chưa đủ dữ liệu để đánh giá (màu xanh dương)</li>
+                    </ul>
+                </div>
+
+                <div class="mb-2">
+                    <h6 class="text-primary">6. Xem chi tiết</h6>
+                    <ul>
+                        <li>
+                            Nhấn nút <strong>Chi tiết</strong> trong bảng tổng hợp để xem:
+                            <ul>
+                                <li>Danh sách tất cả các click của Sub ID đó (Click ID, Sub ID đầy đủ, Thời gian)</li>
+                                <li>Danh sách tất cả các đơn hàng từ Sub ID đó (Order ID, Thời gian, Hoa hồng, Giá trị đơn)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mb-2">
+                    <h6 class="text-primary">7. Phân tích Click</h6>
+                    <p>Phần <strong>Phân tích Click</strong> cung cấp các thông tin:</p>
+                    <ul>
+                        <li><strong>Phân bổ theo Platform:</strong> Biểu đồ tròn cho biết click đến từ platform nào (Facebook, Google, v.v.)</li>
+                        <li><strong>Click theo Khu vực:</strong> Biểu đồ cột cho biết số lượng click theo từng khu vực</li>
+                        <li><strong>Top SubID theo Click:</strong> Bảng xếp hạng các Sub ID có nhiều click nhất</li>
+                    </ul>
+                </div>
+
+                <div class="mb-2">
+                    <h6 class="text-primary">8. Lưu ý quan trọng</h6>
+                    <ul>
+                        <li>Dữ liệu click cần được <strong>đồng bộ</strong> từ trang cài đặt trước khi sử dụng</li>
+                        <li>Nếu chưa có dữ liệu, mở <strong>Cài đặt</strong> → <strong>Đồng bộ Click</strong> → Nhấn <strong>Đồng bộ Click ngay</strong></li>
+                        <li>Các chỉ số được tính toán dựa trên dữ liệu đã đồng bộ và các bộ lọc bạn đã chọn</li>
+                        <li>Bảng dữ liệu hỗ trợ sắp xếp và tìm kiếm để dễ dàng phân tích</li>
+                    </ul>
+                </div>
+
+                <div class="alert alert-info mt-2 p-0">
+                    <strong>💡 Mẹo:</strong> Sử dụng các bộ lọc để so sánh hiệu quả giữa các Sub ID, các khoảng thời gian khác nhau, giúp bạn tối ưu hóa chiến lược marketing và tăng lợi nhuận.
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Modal -->
+        <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailModalTitle">Chi tiết Sub ID</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <h6>Clicks (Tổng: <span id="detailClicksCount">0</span>)</h6>
+                            <div class="table-responsive" style="max-height: 300px">
+                                <table class="table table-sm table-bordered table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Click ID</th>
+                                            <th>Sub ID đầy đủ</th>
+                                            <th>Thời gian Click</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detailClicksList">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div>
+                            <h6>Đơn hàng (Tổng: <span id="detailOrdersCount">0</span>)</h6>
+                            <div class="table-responsive" style="max-height: 300px">
+                                <table class="table table-sm table-bordered table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Order ID</th>
+                                            <th>Sub ID đầy đủ</th>
+                                            <th>Thời gian đơn</th>
+                                            <th class="text-end">Hoa hồng</th>
+                                            <th class="text-end">Giá trị đơn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detailOrdersList">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CPC Configuration Modal -->
+        <div class="modal fade" id="cpcConfigModal" tabindex="-1" aria-labelledby="cpcConfigModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header p-2">
+                        <h5 class="modal-title" id="cpcConfigModalLabel">Cấu hình CPC (Cost Per Click)</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-2">
+                        <div class="mb-2">
+                            <label for="averageCPC" class="form-label"><strong>CPC trung bình (VND):</strong></label>
+                            <input type="number" class="form-control" id="averageCPC" min="0" step="100" value="0" />
+                            <small class="text-muted">CPC mặc định cho tất cả clicks nếu không có cấu hình riêng cho SubID. Đặt 0 nếu chỉ rải link không quảng cáo.</small>
+                        </div>
+
+                        <div>
+                            <label class="form-label"><strong>CPC theo SubID:</strong></label>
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control form-control-sm" id="subIdCPCInput" placeholder="Tên SubID (ví dụ: fb_page-page1----)" />
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" class="form-control form-control-sm" id="subIdCPCValue" placeholder="CPC (VND)" min="0" step="100" />
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-primary btn-sm w-100" id="addSubIdCPCBtn">Thêm</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive" style="max-height: 300px">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>SubID</th>
+                                            <th>CPC (VND)</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="subIdCPCList">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info m-2 p-0">
+                        <small><strong>💡 Lưu ý:</strong> Sau khi lưu cấu hình CPC, vui lòng tải lại trang để áp dụng cấu hình mới cho các tính toán.</small>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-primary" id="saveCPCConfigBtn">Lưu cấu hình</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/jquery.dataTables.min.js"></script>
+        <script src="/js/dataTables.bootstrap5.min.js"></script>
+        <script src="/js/chart.js"></script>
+        <script src="/js/idb.js"></script>
+        <script src="/js/common-header.js"></script>
+        <script src="/js/click-overview.js"></script>
+    </body>
+</html>

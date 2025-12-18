@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Chi tiết sản phẩm - Shopee Commission Calculator</title>
+        <link href="/css/bootstrap.min.css" rel="stylesheet" />
+        <script src="/js/chart.js"></script>
+        <style>
+            body {
+                background-color: #fffaf5;
+                color: #333;
+                font-family: "Segoe UI", sans-serif;
+            }
+
+            a {
+                text-decoration: none;
+            }
+
+            .header-section {
+                background-color: white;
+                border-radius: 8px;
+                padding: 15px;
+                margin-bottom: 15px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .info-section {
+                background-color: white;
+                border-radius: 8px;
+                padding: 8px;
+                margin-bottom: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .stats-card {
+                background-color: white;
+                border-radius: 8px;
+                padding: 8px;
+                margin-bottom: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .chart-container {
+                position: relative;
+                height: 300px;
+                width: 100%;
+            }
+
+            .loading {
+                text-align: center;
+                padding: 20px;
+            }
+
+            .alert-warning {
+                background-color: #fff3cd;
+                border: 1px solid #ffeeba;
+                color: #856404;
+            }
+
+            .breadcrumb {
+                background-color: transparent;
+                padding: 0;
+                margin-bottom: 15px;
+            }
+
+            .stat-box {
+                background-color: #f8f9fa;
+                border-radius: 6px;
+                padding: 12px;
+                text-align: center;
+                margin-bottom: 10px;
+            }
+
+            .stat-box-label {
+                font-size: 0.85rem;
+                color: #666;
+                margin-bottom: 5px;
+            }
+
+            .stat-box-value {
+                font-size: 1.2rem;
+                font-weight: 600;
+                color: #f36f21;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container mt-4">
+            <h2 class="text-center mb-3">Chi tiết sản phẩm</h2>
+            <div id="common-header"></div>
+
+            <div id="loadingMessage" class="loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <p class="mt-2">Đang tải dữ liệu...</p>
+            </div>
+
+            <div id="noDataMessage" class="alert alert-warning" style="display: none">
+                <strong>Không tìm thấy dữ liệu!</strong>
+                <p class="mb-1">Không tìm thấy thông tin sản phẩm này trong hệ thống.</p>
+                <p class="mt-2 mb-0">
+                    <a href="product-analytics.html" class="btn btn-sm btn-primary">Quay lại Phân tích sản phẩm</a>
+                </p>
+            </div>
+
+            <!-- Main Content -->
+            <div id="mainContent" style="display: none">
+                <!-- Product Info -->
+                <div class="info-section">
+                    <h5 id="productName">-</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-box">
+                                <div class="stat-box-label">Shop</div>
+                                <div class="stat-box-value" id="shopName">-</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-box">
+                                <div class="stat-box-label">Danh mục</div>
+                                <div class="stat-box-value" id="category">-</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-box">
+                                <div class="stat-box-label">Item ID</div>
+                                <div class="stat-box-value" id="itemId">-</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-box">
+                                <div class="stat-box-label">Link</div>
+                                <div class="stat-box-value">
+                                    <a id="productLink" href="#" target="_blank">🔗</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Stats -->
+                <div class="info-section">
+                    <h5>Thống kê tổng quan</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-box">
+                                <div class="stat-box-label">Đã bán</div>
+                                <div class="stat-box-value" id="totalSold">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-box">
+                                <div class="stat-box-label">Clicks</div>
+                                <div class="stat-box-value" id="totalClicks">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-box">
+                                <div class="stat-box-label">Tổng hoa hồng</div>
+                                <div class="stat-box-value" id="totalCommission">0 ₫</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-box">
+                                <div class="stat-box-label">EPC</div>
+                                <div class="stat-box-value" id="totalEPC">0 ₫</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="stats-card">
+                            <h6>Hoa hồng theo ngày</h6>
+                            <div class="chart-container">
+                                <canvas id="commissionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stats-card">
+                            <h6>Đơn hàng theo ngày</h6>
+                            <div class="chart-container">
+                                <canvas id="ordersChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="stats-card">
+                            <h6>Hoa hồng theo kênh</h6>
+                            <div class="chart-container">
+                                <canvas id="channelChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stats-card">
+                            <h6>Đơn hàng theo kênh</h6>
+                            <div class="chart-container">
+                                <canvas id="channelOrdersChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Breakdown Table -->
+                <div class="stats-card">
+                    <h6>Chi tiết đơn hàng theo ngày</h6>
+                    <div class="table-responsive">
+                        <table id="breakdownTable" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Số đơn</th>
+                                    <th>Hoa hồng</th>
+                                    <th>GMV</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/idb.js"></script>
+        <script src="/js/common-header.js"></script>
+        <script src="/js/server-config.js"></script>
+        <script src="/js/utils.js"></script>
+        <script src="/js/product-analytics.js"></script>
+        <script src="/js/product-detail-page.js"></script>
+    </body>
+</html>

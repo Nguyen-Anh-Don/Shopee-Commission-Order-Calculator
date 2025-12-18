@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sản phẩm yêu thích - Shopee Commission Calculator</title>
+        <link href="/css/bootstrap.min.css" rel="stylesheet" />
+        <style>
+            body {
+                background-color: #fffaf5;
+                color: #333;
+                font-family: "Segoe UI", sans-serif;
+            }
+
+            a {
+                text-decoration: none;
+            }
+
+            .stats-card {
+                background-color: white;
+                border-radius: 8px;
+                padding: 8px;
+                margin-bottom: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .favorite-item {
+                background-color: #f8f9fa;
+                border-radius: 6px;
+                padding: 12px;
+                margin-bottom: 10px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                transition: transform 0.2s, box-shadow 0.2s;
+                border: 1px solid #dee2e6;
+            }
+
+            .favorite-item:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            }
+
+            .favorite-item-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: start;
+                margin-bottom: 10px;
+            }
+
+            .favorite-item-title {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 5px;
+            }
+
+            .favorite-item-shop {
+                font-size: 0.9rem;
+                color: #666;
+                margin-bottom: 5px;
+            }
+
+            .favorite-item-category {
+                font-size: 0.85rem;
+                color: #999;
+            }
+
+            .favorite-item-notes {
+                margin-top: 10px;
+                padding: 10px;
+                background-color: #f8f9fa;
+                border-radius: 4px;
+                font-size: 0.9rem;
+                color: #666;
+            }
+
+            .favorite-item-tags {
+                margin-top: 8px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            .tag {
+                display: inline-block;
+                padding: 3px 8px;
+                background-color: #e3f2fd;
+                color: #1976d2;
+                border-radius: 12px;
+                font-size: 0.8rem;
+            }
+
+            .favorite-item-actions {
+                display: flex;
+                gap: 5px;
+            }
+
+            .loading {
+                text-align: center;
+                padding: 20px;
+            }
+
+            .alert-warning {
+                background-color: #fff3cd;
+                border: 1px solid #ffeeba;
+                color: #856404;
+            }
+
+            .edit-form {
+                display: none;
+                margin-top: 10px;
+            }
+
+            .edit-form.active {
+                display: block;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container mt-4">
+            <h2 class="h4 text-center mb-3">⭐ Sản phẩm yêu thích</h2>
+            <div id="common-header"></div>
+
+            <div id="loadingMessage" class="loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <p class="mt-2">Đang tải danh sách yêu thích...</p>
+            </div>
+
+            <div id="noDataMessage" class="alert alert-warning" style="display: none">
+                <strong>Chưa có sản phẩm yêu thích!</strong>
+                <p class="mb-1">Bạn chưa lưu sản phẩm nào vào danh sách yêu thích.</p>
+                <p class="mt-2 mb-0">
+                    <a href="product-analytics.html" class="btn btn-sm btn-primary">Xem Phân tích sản phẩm</a>
+                </p>
+            </div>
+
+            <!-- Main Content -->
+            <div id="mainContent" style="display: none">
+                <div class="stats-card">
+                    <div id="favoritesContainer"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header p-2">
+                        <h6 class="modal-title">Sửa sản phẩm yêu thích</h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-2">
+                        <form id="editForm">
+                            <input type="hidden" id="editFavoriteId" />
+                            <div class="mb-3">
+                                <label for="editNotes" class="form-label">Ghi chú</label>
+                                <textarea class="form-control" id="editNotes" rows="3" placeholder="Nhập ghi chú về sản phẩm này..."></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editTags" class="form-label">Tags (phân cách bằng dấu phẩy)</label>
+                                <input type="text" class="form-control" id="editTags" placeholder="ví dụ: hot, trending, bestseller" />
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-primary" id="saveFavoriteBtn">Lưu</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/idb.js"></script>
+        <script src="/js/common-header.js"></script>
+        <script src="/js/favorites-page.js"></script>
+    </body>
+</html>

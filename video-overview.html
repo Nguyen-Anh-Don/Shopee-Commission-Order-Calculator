@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tổng quan Video - Shopee Commission Calculator</title>
+        <link href="/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+        <style>
+            body {
+                background-color: #fffaf5;
+                color: #333;
+                font-family: "Segoe UI", sans-serif;
+            }
+
+            a {
+                text-decoration: none;
+            }
+
+            .filter-section {
+                background-color: white;
+                border-radius: 8px;
+                padding: 8px;
+                margin-bottom: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .stats-card {
+                background-color: white;
+                border-radius: 8px;
+                padding: 8px;
+                margin-bottom: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .summary-stats-card {
+                background-color: white;
+                border-radius: 8px;
+                padding: 15px;
+                margin-bottom: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .summary-box {
+                background-color: white;
+                border-radius: 8px;
+                padding: 12px;
+                text-align: center;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                border: 2px solid #e0e0e0;
+                margin-bottom: 10px;
+                transition: transform 0.2s;
+            }
+
+            .summary-box:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .summary-box.total-videos {
+                border-color: #2196f3;
+                background-color: #e3f2fd;
+                color: #0d47a1;
+            }
+
+            .summary-box.total-orders {
+                border-color: #4caf50;
+                background-color: #e8f5e9;
+                color: #1b5e20;
+            }
+
+            .summary-box.total-gmv {
+                border-color: #ff9800;
+                background-color: #fff3e0;
+                color: #e65100;
+            }
+
+            .summary-box.total-commission {
+                border-color: #f36f21;
+                background-color: #ffe1b2;
+                color: #333;
+            }
+
+            .summary-box small {
+                display: block;
+                font-size: 0.85rem;
+                margin-bottom: 5px;
+                font-weight: 500;
+            }
+
+            .summary-box .summary-value {
+                font-size: 1.5rem;
+                font-weight: bold;
+                margin: 0;
+            }
+
+            .table-responsive {
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .loading {
+                text-align: center;
+                padding: 20px;
+            }
+
+            .video-image {
+                width: 60px;
+                height: 60px;
+                object-fit: cover;
+                border-radius: 4px;
+            }
+
+            .video-image-placeholder {
+                width: 60px;
+                height: 60px;
+                background-color: #f0f0f0;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                color: #999;
+            }
+
+            .has-orders {
+                background-color: #e8f5e9;
+            }
+
+            .no-orders {
+                background-color: #fff3e0;
+            }
+
+            .chart-container {
+                position: relative;
+                height: 300px;
+                width: 100%;
+            }
+
+            .video-badge {
+                display: inline-block;
+                padding: 2px 8px;
+                border-radius: 12px;
+                font-size: 11px;
+                font-weight: bold;
+            }
+
+            .badge-has-orders {
+                background-color: #4caf50;
+                color: white;
+            }
+
+            .badge-no-orders {
+                background-color: #ff9800;
+                color: white;
+            }
+
+            .quick-date-btn.active {
+                background-color: #0d6efd;
+                color: white;
+                border-color: #0d6efd;
+            }
+
+            .quick-date-btn.active:hover {
+                background-color: #0b5ed7;
+                border-color: #0a58ca;
+            }
+
+            .guide-section {
+                background-color: white;
+                border-radius: 8px;
+                padding: 0.5rem;
+                margin-top: 1rem;
+                margin-bottom: 0.5rem;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            .guide-section h5 {
+                color: #0d6efd;
+                border-bottom: 2px solid #0d6efd;
+                padding-bottom: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .guide-section h6 {
+                color: #333;
+                margin-top: 0.5rem;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+            }
+
+            .guide-section ul {
+                padding-left: 1rem;
+            }
+
+            .guide-section li {
+                margin-bottom: 0.5rem;
+                line-height: 1.6;
+            }
+
+            .guide-section .feature-item {
+                background-color: #f8f9fa;
+                padding: 0.5rem;
+                border-radius: 6px;
+                margin-bottom: 0.5rem;
+                border-left: 4px solid #0d6efd;
+            }
+
+            .guide-section .feature-item strong {
+                color: #0d6efd;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container mt-4">
+            <h4 class="text-center mb-2">📹 Tổng quan Video</h4>
+            <div id="common-header"></div>
+
+            <div id="loadingMessage" class="loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <p class="mt-2">Đang tải dữ liệu...</p>
+            </div>
+
+            <div id="noDataMessage" class="alert alert-warning" style="display: none">
+                <strong>Chưa có dữ liệu video!</strong>
+                <p class="mb-1">Chưa có đơn hàng nào từ kênh video Shopee.</p>
+                <p class="mb-0 small">Dữ liệu sẽ được hiển thị sau khi có đơn hàng từ video.</p>
+            </div>
+
+            <div id="noFilterResultsMessage" class="alert alert-info p-2" style="display: none">
+                <strong>Không có kết quả!</strong>
+                <p class="mb-0">Không tìm thấy video nào phù hợp với bộ lọc bạn đã chọn. Vui lòng thử lại với tiêu chí khác.</p>
+            </div>
+
+            <div id="mainContent" style="display: none">
+                <!-- Phần bộ lọc -->
+                <div class="filter-section">
+                    <form id="filterForm">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="searchInput" class="small">Tìm kiếm:</label>
+                                    <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="ID sản phẩm hoặc tên sản phẩm" />
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="filterHasOrders" class="small">Trạng thái:</label>
+                                    <select class="form-control form-control-sm" id="filterHasOrders">
+                                        <option value="all">Tất cả</option>
+                                        <option value="has">Có đơn</option>
+                                        <option value="no">Không có đơn</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="minOrders" class="small">Số đơn tối thiểu:</label>
+                                    <input type="number" class="form-control form-control-sm" id="minOrders" min="0" value="" placeholder="0" />
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="minGMV" class="small">GMV tối thiểu (₫):</label>
+                                    <input type="number" class="form-control form-control-sm" id="minGMV" min="0" value="" placeholder="0" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="small">Chọn nhanh:</label>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-outline-primary quick-date-btn" data-days="7">7 ngày</button>
+                                        <button type="button" class="btn btn-outline-primary quick-date-btn" data-days="30">30 ngày</button>
+                                        <button type="button" class="btn btn-outline-primary quick-date-btn" data-days="90">90 ngày</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="start_date" class="small">Từ ngày:</label>
+                                    <input type="date" class="form-control form-control-sm" id="start_date" name="start_date" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="end_date" class="small">Đến ngày:</label>
+                                    <input type="date" class="form-control form-control-sm" id="end_date" name="end_date" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-warning btn-sm px-3 py-1" id="applyFiltersBtn">👉 Lọc dữ liệu</button>
+                                <button type="button" class="btn btn-secondary btn-sm px-3 py-1 ml-2" id="resetFiltersBtn">🔄 Reset</button>
+                                <button type="button" class="btn btn-success btn-sm px-3 py-1 ml-2" id="exportBtn">📥 Xuất CSV</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Summary Stats -->
+                <div class="summary-stats-card">
+                    <h6 class="mb-3">📊 Tổng quan thống kê</h6>
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <div class="summary-box total-videos">
+                                <small>Tổng số video</small>
+                                <p class="summary-value mb-0" id="summaryTotalVideos">0</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <div class="summary-box total-orders">
+                                <small>Tổng đơn hàng</small>
+                                <p class="summary-value mb-0" id="summaryTotalOrders">0</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <div class="summary-box total-gmv">
+                                <small>Tổng GMV</small>
+                                <p class="summary-value mb-0" id="summaryTotalGMV">0 ₫</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <div class="summary-box total-commission">
+                                <small>Tổng hoa hồng</small>
+                                <p class="summary-value mb-0" id="summaryTotalCommission">0 ₫</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="stats-card" id="chartsSection" style="display: none">
+                    <h6 class="mb-3">📈 Biểu đồ thống kê</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6 class="mb-2">🏆 Top 5 Video theo số đơn</h6>
+                            <div class="chart-container">
+                                <canvas id="topOrdersChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="mb-2">🏆 Top 5 Video theo GMV</h6>
+                            <div class="chart-container">
+                                <canvas id="topGMVChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="mb-2">🏆 Top 5 Video theo hoa hồng</h6>
+                            <div class="chart-container">
+                                <canvas id="topCommissionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Table -->
+                <div class="stats-card">
+                    <h6 class="mb-3">📋 Danh sách Video</h6>
+                    <div class="table-responsive">
+                        <table id="videoTable" class="table table-bordered table-hover" style="width: 100%">
+                            <thead class="thead-light" style="font-size: 12px; white-space: nowrap">
+                                <tr>
+                                    <th>Ảnh</th>
+                                    <th>ID Sản phẩm</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Số đơn</th>
+                                    <th>Tổng GMV</th>
+                                    <th>Tổng hoa hồng</th>
+                                    <th>Đơn đầu tiên</th>
+                                    <th>Đơn cuối</th>
+                                    <th style="width: 50px">Chi tiết</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hướng dẫn sử dụng -->
+            <div class="guide-section">
+                <h5>📖 Giới thiệu & Hướng dẫn sử dụng</h5>
+
+                <div class="feature-item">
+                    <strong>📹 Trang Tổng quan Video là gì?</strong>
+                    <p class="mb-0 mt-2">
+                        Trang này giúp bạn theo dõi và phân tích hiệu quả của các video sản phẩm trên Shopee. Bạn có thể xem thống kê về số đơn hàng, GMV (Gross Merchandise Value) và hoa hồng được tạo
+                        ra từ mỗi video sản phẩm.
+                    </p>
+                </div>
+
+                <h6>🎯 Các tính năng chính:</h6>
+                <ul>
+                    <li><strong>Tổng quan thống kê:</strong> Hiển thị tổng số video, tổng đơn hàng, tổng GMV và tổng hoa hồng trong khoảng thời gian đã chọn.</li>
+                    <li><strong>Biểu đồ thống kê:</strong> Hiển thị Top 5 video theo số đơn, GMV và hoa hồng để dễ dàng so sánh hiệu quả.</li>
+                    <li><strong>Danh sách video:</strong> Bảng chi tiết tất cả các video với đầy đủ thông tin về đơn hàng, GMV và hoa hồng.</li>
+                    <li><strong>Xem chi tiết:</strong> Click vào nút "Chi tiết" để xem danh sách đơn hàng từ video cụ thể.</li>
+                </ul>
+
+                <h6>🔍 Hướng dẫn sử dụng bộ lọc:</h6>
+                <ul>
+                    <li><strong>Tìm kiếm:</strong> Nhập ID sản phẩm hoặc tên sản phẩm để tìm video cụ thể.</li>
+                    <li>
+                        <strong>Trạng thái:</strong>
+                        <ul>
+                            <li><strong>Tất cả:</strong> Hiển thị tất cả video (có đơn và không có đơn)</li>
+                            <li><strong>Có đơn:</strong> Chỉ hiển thị video đã có đơn hàng</li>
+                            <li><strong>Không có đơn:</strong> Chỉ hiển thị video chưa có đơn hàng</li>
+                        </ul>
+                    </li>
+                    <li><strong>Số đơn tối thiểu:</strong> Lọc video có số đơn hàng lớn hơn hoặc bằng số bạn nhập.</li>
+                    <li><strong>GMV tối thiểu:</strong> Lọc video có tổng GMV lớn hơn hoặc bằng số tiền bạn nhập (đơn vị: VNĐ).</li>
+                    <li><strong>Chọn nhanh:</strong> Click vào các nút "7 ngày", "30 ngày", "90 ngày" để tự động chọn khoảng thời gian tương ứng tính từ hôm nay.</li>
+                    <li><strong>Từ ngày / Đến ngày:</strong> Chọn khoảng thời gian cụ thể để xem dữ liệu.</li>
+                </ul>
+
+                <h6>📊 Giải thích các thống kê:</h6>
+                <ul>
+                    <li><strong>Tổng số video:</strong> Số lượng video sản phẩm trong khoảng thời gian đã chọn.</li>
+                    <li><strong>Tổng đơn hàng:</strong> Tổng số đơn hàng được tạo ra từ tất cả các video.</li>
+                    <li><strong>Tổng GMV:</strong> Tổng giá trị đơn hàng (Gross Merchandise Value) từ các video.</li>
+                    <li><strong>Tổng hoa hồng:</strong> Tổng số tiền hoa hồng bạn nhận được từ các đơn hàng video.</li>
+                </ul>
+
+                <h6>💡 Mẹo sử dụng:</h6>
+                <ul>
+                    <li>Sử dụng bộ lọc để tìm video hiệu quả nhất hoặc video chưa có đơn hàng để tối ưu hóa.</li>
+                    <li>Xem biểu đồ Top 5 để nhanh chóng xác định video nào đang hoạt động tốt nhất.</li>
+                    <li>Click "Chi tiết" để xem danh sách đơn hàng từ video cụ thể và phân tích sâu hơn.</li>
+                    <li>Sử dụng nút "Xuất CSV" để tải dữ liệu về máy và phân tích bằng Excel hoặc Google Sheets.</li>
+                    <li>Kết hợp với trang "Lịch sử đơn hàng" để xem thông tin chi tiết hơn về từng đơn hàng.</li>
+                </ul>
+
+                <div class="alert alert-info mt-3 mb-0 p-0">
+                    <strong>💬 Lưu ý:</strong> Dữ liệu được lấy từ các đơn hàng đã được lưu trong hệ thống. Nếu bạn chưa thấy dữ liệu, hãy đảm bảo bạn đã thu thập đơn hàng từ Shopee trước đó.
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Modal -->
+        <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header p-2">
+                        <h6 class="modal-title" id="detailModalTitle">Chi tiết Video</h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-2">
+                        <div id="videoDetailInfo" class="mb-3"></div>
+                        <div>
+                            <h6>Đơn hàng từ video này (Tổng: <span id="detailOrdersCount">0</span>)</h6>
+                            <div class="table-responsive" style="max-height: 400px">
+                                <table class="table table-sm table-bordered table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Order ID</th>
+                                            <th>Ngày đơn</th>
+                                            <th class="text-end">GMV</th>
+                                            <th class="text-end">Hoa hồng</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detailOrdersList">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer p-2">
+                        <a href="#" id="viewOrderHistoryLink" class="btn btn-primary" target="_blank">Xem trong lịch sử đơn hàng</a>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/chart.js"></script>
+        <script src="/js/chartjs-plugin-datalabels.min.js"></script>
+        <script src="/js/jquery.dataTables.min.js"></script>
+        <script src="/js/dataTables.bootstrap5.min.js"></script>
+        <script src="/js/idb.js"></script>
+        <script src="/js/common-header.js"></script>
+        <script src="/js/processOrderData.js"></script>
+        <script src="/js/video-overview.js"></script>
+    </body>
+</html>

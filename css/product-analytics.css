@@ -1,0 +1,40 @@
+/* Product Analytics Additional Styles */
+/* Most styles are inline in HTML for simplicity, but additional styles can be added here */
+
+.product-card {
+    cursor: pointer;
+}
+
+.product-card:hover {
+    border-color: #f36f21;
+}
+
+.favorite-btn {
+    transition: all 0.2s;
+}
+
+.favorite-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .product-card {
+        flex-direction: column;
+    }
+
+    .product-card-image {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .product-card-stats {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+

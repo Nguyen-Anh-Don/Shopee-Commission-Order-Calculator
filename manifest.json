@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "__MSG_extName__",
-    "version": "2.0.0",
+    "version": "2.2.5",
     "description": "__MSG_extDesc__",
     "default_locale": "vi",
     "action": {
@@ -34,20 +34,37 @@
     "content_scripts": [
         {
             "matches": ["https://shopee.vn/*", "https://*.shopee.vn/*"],
-            "js": ["js/content.js"],
-            "run_at": "document_start"
+            "js": [
+                "js/server-config.js",
+                "js/idb.js",
+                "js/utils.js",
+                "js/content.js"
+            ],
+            "run_at": "document_idle"
         },
         {
             "matches": ["https://affiliate.shopee.vn/*"],
-            "js": ["js/affiliate-product-offer.js"],
+            "js": [
+                "js/server-config.js",
+                "js/affiliate-product-offer.js"
+            ],
             "css": ["css/affiliate-product-offer.css"],
             "run_at": "document_start"
         }
     ],
     "web_accessible_resources": [
         {
-            "resources": ["js/injected-product-offer.js"],
-            "matches": ["https://affiliate.shopee.vn/*"]
+            "resources": [
+                "js/chart.min.js",
+                "js/chart.js",
+                "js/price-chart-creator.js",
+                "js/injected-product-offer.js"
+            ],
+            "matches": [
+                "https://affiliate.shopee.vn/*",
+                "https://shopee.vn/*",
+                "https://*.shopee.vn/*"
+            ]
         }
     ]
 }
